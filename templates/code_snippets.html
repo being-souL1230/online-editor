@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Snippets - CodeZone</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #8b5cf6;
+            --accent: #22d3ee;
+            --dark-1: #0f172a;
+            --dark-2: #1e293b;
+            --dark-3: #334155;
+            --light-1: #e2e8f0;
+            --light-2: #f1f5f9;
+            --gradient: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            color: var(--light-1);
+            font-family: 'Segoe UI', 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            width: 100%;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+            position: relative;
+        }
+        
+        h1 {
+    font-size: 3.2rem;
+    font-weight: 800;
+    color: var(--light-2);
+    letter-spacing: -0.5px;
+    background: none;
+    -webkit-text-fill-color: initial;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.4);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    transition: color 0.3s ease;
+}
+
+h1 i {
+    font-size: 1.5rem;
+    color: var(--accent);
+    filter: none;
+    transform: translateY(2px);
+}
+        
+        h1::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 4px;
+            background: var(--gradient);
+            border-radius: 2px;
+        }
+
+
+        
+        .navbar {
+            background: rgba(30, 30, 47, 0.7);
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .navbar-links {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .navbar a {
+            color: var(--light-1);
+            text-decoration: none;
+            font-size: 1.1rem;
+            font-weight: 500;
+            padding: 0.6rem 1.2rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .navbar a:hover {
+            background: rgba(99, 102, 241, 0.2);
+            transform: translateY(-2px);
+        }
+        
+        .navbar a i {
+            font-size: 0.9rem;
+        }
+        
+        .user-greeting {
+            font-weight: 600;
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .user-greeting i {
+            color: var(--light-1);
+        }
+        
+        /* TABLE CONTAINER ENHANCED */
+        .table-container {
+            background: linear-gradient(145deg, rgba(30, 30, 47, 0.8), rgba(20, 20, 35, 0.8));
+            border-radius: 16px;
+            padding: 1.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            overflow-x: auto;
+            transition: all 0.3s ease;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.95rem;
+            overflow: hidden;
+            border-radius: 12px;
+            background-color: rgba(255, 255, 255, 0.01);
+            backdrop-filter: blur(2px);
+        }
+        
+        thead {
+            background: rgba(40, 40, 60, 0.85);
+        }
+        
+        th {
+            padding: 1rem 1.2rem;
+            text-align: left;
+            font-size: 0.85rem;
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        tbody tr {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+            animation: fadeInUp 0.3s ease both;
+            position: relative;
+        }
+        
+        tbody tr:nth-child(even) {
+            background-color: rgba(255, 255, 255, 0.015);
+        }
+        
+        tbody tr:hover {
+            background-color: rgba(99, 102, 241, 0.08);
+            box-shadow: 0 4px 14px rgba(99, 102, 241, 0.2);
+            transform: translateY(-1px);
+        }
+        
+        td {
+            padding: 1rem 1.2rem;
+            vertical-align: middle;
+            color: var(--light-1);
+            position: relative;
+        }
+        
+        tbody tr td:first-child::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 15%;
+            bottom: 15%;
+            width: 4px;
+            background: var(--gradient);
+            border-radius: 4px;
+        }
+        
+        .lang-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            background: rgba(255, 255, 255, 0.08);
+            padding: 0.3rem 0.7rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--light-1);
+            text-transform: capitalize;
+        }
+        
+        .lang-badge i {
+            font-size: 1rem;
+            color: var(--accent);
+        }
+        
+        .view-btn,
+        .dialog-btn {
+            background: var(--gradient);
+            color: var(--light-2);
+            border: none;
+            padding: 0.65rem 1.2rem;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .view-btn:hover,
+        .dialog-btn:hover {
+            transform: translateY(-2px);
+            background: linear-gradient(90deg, var(--primary-dark), var(--secondary));
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
+        }
+        
+        .view-btn:focus-visible,
+        .dialog-btn:focus-visible {
+            outline: 2px dashed var(--accent);
+            outline-offset: 3px;
+        }
+        
+        .dialog-btn-copy:active {
+            animation: pulse 0.4s ease;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: rgba(226, 232, 240, 0.6);
+        }
+        
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: rgba(226, 232, 240, 0.3);
+        }
+        
+        /* DIALOG */
+        .dialog-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            backdrop-filter: blur(5px);
+        }
+        
+        .dialog-overlay.active {
+            display: flex;
+            opacity: 1;
+        }
+        
+        .dialog-box {
+            background: var(--dark-2);
+            padding: 2rem;
+            border-radius: 16px;
+            width: min(90%, 700px);
+            max-height: 85vh;
+            overflow: auto;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            color: var(--light-1);
+            transform: translateY(20px);
+            transition: transform 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .dialog-overlay.active .dialog-box {
+            animation: dialogIn 0.4s ease forwards;
+        }
+        
+        @keyframes dialogIn {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        @keyframes dialogOut {
+            from { transform: translateY(0); opacity: 1; }
+            to { transform: translateY(50px); opacity: 0; }
+        }
+        
+        .dialog-box h3 {
+            margin-bottom: 1.5rem;
+            color: var(--accent);
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .dialog-box pre {
+            background: var(--dark-1);
+            padding: 1.5rem;
+            border-radius: 8px;
+            font-family: 'Fira Code', 'Consolas', 'Courier New', monospace;
+            white-space: pre-wrap;
+            max-height: 50vh;
+            overflow: auto;
+            line-height: 1.5;
+            position: relative;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .dialog-box pre::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--gradient);
+            border-radius: 4px 0 0 4px;
+        }
+        
+        .dialog-actions {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 1.5rem;
+            gap: 1rem;
+        }
+        
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(99, 102, 241, 0.5);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary);
+        }
+        
+        /* Responsive Table (Mobile) */
+        @media (max-width: 768px) {
+            table thead {
+                display: none;
+            }
+        
+            table tbody, table tr, table td {
+                display: block;
+                width: 100%;
+            }
+        
+            table tr {
+                margin-bottom: 1.5rem;
+                border: 1px solid rgba(255, 255, 255, 0.05);
+                border-radius: 12px;
+                padding: 1rem;
+                background: rgba(255, 255, 255, 0.03);
+                box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+                transition: all 0.3s ease;
+            }
+        
+            table td {
+                padding: 0.6rem 0;
+                border: none;
+                text-align: left;
+            }
+        
+            table td::before {
+                content: attr(data-label);
+                font-weight: bold;
+                color: var(--accent);
+                display: block;
+                font-size: 0.85rem;
+                margin-bottom: 0.3rem;
+            }
+        
+            .view-btn {
+                width: 100%;
+                justify-content: center;
+            }
+        
+            .container {
+                padding: 1rem;
+            }
+        
+            h1 {
+                font-size: 2rem;
+            }
+        
+            .navbar {
+                flex-direction: column;
+                gap: 1rem;
+                padding: 1rem;
+            }
+        
+            .navbar-links {
+                width: 100%;
+                justify-content: space-around;
+            }
+        
+            th, td {
+                font-size: 0.9rem;
+            }
+        
+            .view-btn {
+                padding: 0.5rem 0.8rem;
+                font-size: 0.8rem;
+            }
+        }
+
+        .view-icon-btn:active {
+    transform: scale(1);
+    opacity: 0.8;
+}
+        
+        /* Tooltip */
+        .tooltip {
+            position: relative;
+            display: inline-block;
+        }
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 120px;
+            background-color: var(--dark-3);
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 5px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 0.8rem;
+        }
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+        
+        /* Animation */
+        @keyframes fadeInUp {
+            0% { opacity: 0; transform: translateY(10px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+        
+        .status-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        
+        .status-active {
+            background-color: #10b981;
+            box-shadow: 0 0 8px #10b981;
+        }
+        .view-icon-btn {
+    background: none;
+    border: none;
+    color: var(--accent);
+    font-size: 1.15rem;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.view-icon-btn:hover {
+    color: var(--primary);
+    transform: scale(1.15);
+}
+
+.view-icon-btn:focus-visible {
+    outline: 2px dashed var(--accent);
+    outline-offset: 4px;
+}
+
+        </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-code"></i> My Snippets</h1>
+        </header>
+        <div class="navbar">
+            <div class="navbar-links">
+                <a href="{{ url_for('dashboard') }}"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+                <a href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt"></i> Logout</a>
+            </div>
+            <div class="user-greeting">
+                <i class="fas fa-user-circle"></i> Welcome, {{ name }}
+            </div>
+        </div>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Problem ID</th>
+                        <th>Title</th>
+                        <th>Language</th>
+                        <th>Submitted At</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for snippet in snippets %}
+                    <tr>
+                        <td data-label="Problem ID">{{ snippet.problem_id }}</td>
+                        <td data-label="Title">{{ snippet.title }}</td>
+                        <td data-label="Language">
+                            <span class="lang-badge">
+                                <i class="{{ snippet.language | lower | icon_class }}"></i>
+                                {{ snippet.language }}
+                            </span>
+                        </td>
+                        <td data-label="Submitted At">{{ snippet.created_at }}</td>
+                        <td data-label="Action">
+                            <div class="tooltip">
+                                <button class="view-icon-btn" onclick="toggleViewIcon(this, '{{ snippet.id | safe }}')">
+                                    <i class="far fa-eye"></i>
+                                </button>
+                                <span class="tooltiptext">View Snippet</span>
+                            </div>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="5">
+                            <div class="empty-state">
+                                <i class="far fa-folder-open"></i>
+                                <p>No snippets found. Start by creating your first code snippet!</p>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="dialog-overlay" id="snippet-dialog">
+            <div class="dialog-box">
+                <h3><i class="fas fa-file-code"></i> Code Snippet (<span id="snippet-language"></span>)</h3>
+                <pre id="snippet-code"></pre>
+                <div class="dialog-actions">
+                    <button class="dialog-btn dialog-btn-copy" onclick="copySnippet()">
+                        <i class="far fa-copy"></i> Copy
+                    </button>
+                    <button class="dialog-btn dialog-btn-close" onclick="closeDialog()">
+                        <i class="fas fa-times"></i> Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        async function viewSnippet(snippetId) {
+            try {
+                const response = await fetch(`/get_snippet/${snippetId}`);
+                const data = await response.json();
+                if (data.status === 'success') {
+                    document.getElementById('snippet-code').textContent = data.source_code;
+                    document.getElementById('snippet-language').textContent = data.language;
+                    
+                    const dialog = document.getElementById('snippet-dialog');
+                    dialog.classList.add('active');
+                    
+                    // Add syntax highlighting based on language
+                    applySyntaxHighlighting(data.language, data.source_code);
+                } else {
+                    showToast(data.message, 'error');
+                }
+            } catch (error) {
+                showToast('Error loading snippet: ' + error.message, 'error');
+            }
+        }
+
+       
+function closeDialog() {
+    const dialog = document.getElementById('snippet-dialog');
+    dialog.classList.remove('active');
+    dialog.classList.add('closing');
+
+    // After 0.5 sec, revert icon back to eye
+    if (lastClickedEyeBtn) {
+        setTimeout(() => {
+            const icon = lastClickedEyeBtn.querySelector('i');
+            if (icon && icon.classList.contains('fa-eye-slash')) {
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+            lastClickedEyeBtn = null;
+        }, 300);
+    }
+
+    setTimeout(() => {
+        dialog.classList.remove('closing');
+    }, 200);
+}
+        
+        function copySnippet() {
+            const code = document.getElementById('snippet-code').textContent;
+            navigator.clipboard.writeText(code).then(() => {
+                showToast('Code copied to clipboard!', 'success');
+            }).catch(err => {
+                showToast('Failed to copy code', 'error');
+            });
+        }
+        
+        function showToast(message, type) {
+            const toast = document.createElement('div');
+            toast.textContent = message;
+            toast.style.position = 'fixed';
+            toast.style.bottom = '20px';
+            toast.style.right = '20px';
+            toast.style.padding = '12px 24px';
+            toast.style.background = type === 'error' ? '#ef4444' : '#10b981';
+            toast.style.color = 'white';
+            toast.style.borderRadius = '8px';
+            toast.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+            toast.style.zIndex = '10000';
+            toast.style.transform = 'translateY(20px)';
+            toast.style.opacity = '0';
+            toast.style.transition = 'all 0.3s ease';
+            
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.transform = 'translateY(0)';
+                toast.style.opacity = '1';
+            }, 10);
+            
+            setTimeout(() => {
+                toast.style.transform = 'translateY(20px)';
+                toast.style.opacity = '0';
+                setTimeout(() => {
+                    document.body.removeChild(toast);
+                }, 300);
+            }, 3000);
+        }
+        
+        function applySyntaxHighlighting(language, code) {
+            // This is a basic implementation - consider using a library like Prism.js or Highlight.js
+            const pre = document.getElementById('snippet-code');
+            pre.innerHTML = ''; // Clear previous content
+            
+            // Simple keyword highlighting for demonstration
+            const keywords = {
+                'python': ['def', 'class', 'import', 'from', 'as', 'return', 'if', 'else', 'elif', 'for', 'while', 'in', 'try', 'except', 'with'],
+                'javascript': ['function', 'class', 'import', 'export', 'return', 'if', 'else', 'for', 'while', 'try', 'catch', 'const', 'let', 'var'],
+                'java': ['public', 'private', 'protected', 'class', 'interface', 'void', 'static', 'return', 'if', 'else', 'for', 'while', 'try', 'catch']
+            };
+            
+            if (keywords[language.toLowerCase()]) {
+                const escapedCode = code.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+                let highlightedCode = escapedCode;
+                
+                keywords[language.toLowerCase()].forEach(keyword => {
+                    const regex = new RegExp(`\\b${keyword}\\b`, 'g');
+                    highlightedCode = highlightedCode.replace(regex, `<span style="color: #22d3ee">${keyword}</span>`);
+                });
+                
+                // Highlight strings
+                highlightedCode = highlightedCode.replace(/(".*?"|'.*?')/g, '<span style="color: #a3e635">$1</span>');
+                
+                // Highlight numbers
+                highlightedCode = highlightedCode.replace(/\b(\d+)\b/g, '<span style="color: #f59e0b">$1</span>');
+                
+                // Highlight comments
+                if (language.toLowerCase() === 'python') {
+                    highlightedCode = highlightedCode.replace(/#.*$/gm, '<span style="color: #64748b">$&</span>');
+                } else if (['javascript', 'java'].includes(language.toLowerCase())) {
+                    highlightedCode = highlightedCode.replace(/\/\/.*$/gm, '<span style="color: #64748b">$&</span>');
+                    highlightedCode = highlightedCode.replace(/\/\*[\s\S]*?\*\//g, '<span style="color: #64748b">$&</span>');
+                }
+                
+                pre.innerHTML = highlightedCode;
+            } else {
+                pre.textContent = code;
+            }
+        }
+        
+        // Close dialog when clicking outside
+        document.getElementById('snippet-dialog').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeDialog();
+            }
+        });
+
+        let lastClickedEyeBtn = null;
+
+function toggleViewIcon(btn, snippetId) {
+    const icon = btn.querySelector('i');
+
+    // Toggle to eye-slash when clicked
+    icon.classList.remove('fa-eye');
+    icon.classList.add('fa-eye-slash');
+
+    lastClickedEyeBtn = btn; // Save the reference
+
+    // Show the dialog
+    viewSnippet(snippetId);
+}
+
+    </script>
+</body>
+</html>

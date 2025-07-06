@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Signup | Code Platform</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        
+        :root {
+            --primary: #06b6d4;
+            --primary-hover: #0891b2;
+            --text: #e2e8f0;
+            --text-secondary: #94a3b8;
+            --glass: rgba(21, 34, 56, 0.7);
+            --glass-border: rgba(6, 182, 212, 0.2);
+            --glass-shadow: rgba(0, 0, 0, 0.3);
+            --bg-gradient-1: #0c1a2b;
+            --bg-gradient-2: #0f172a;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--bg-gradient-1), var(--bg-gradient-2));
+            color: var(--text);
+            font-family: 'Poppins', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+        }
+        
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        .signup-box {
+            background: linear-gradient(135deg, var(--glass), rgba(21, 34, 56, 0.5));
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            box-shadow: 0 8px 32px 0 var(--glass-shadow);
+            padding: 40px;
+            width: 100%;
+            max-width: 420px;
+            transform: perspective(1000px);
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            /* animation: fadeIn 0.8s ease-out forwards; */
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .signup-box::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                to bottom right,
+                rgba(6, 182, 212, 0.1),
+                rgba(6, 182, 212, 0)
+            );
+            transform: rotate(30deg);
+            animation: glassShine 8s infinite linear;
+            z-index: -1;
+        }
+        
+        @keyframes glassShine {
+            0% { transform: rotate(30deg) translate(-30%, -30%); }
+            100% { transform: rotate(30deg) translate(20%, 20%); }
+        }
+        
+        .signup-box:hover {
+            transform: perspective(1000px) translateY(-5px);
+            box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.4);
+            border-color: rgba(6, 182, 212, 0.3);
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .signup-box h2 {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 28px;
+            font-weight: 600;
+            background: linear-gradient(90deg, #06b6d4, #22d3ee);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            position: relative;
+        }
+        
+        .signup-box h2::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary), transparent);
+            border-radius: 3px;
+            animation: linePulse 2s infinite ease-in-out;
+        }
+        
+        @keyframes linePulse {
+            0%, 100% { width: 60px; opacity: 1; }
+            50% { width: 80px; opacity: 0.7; }
+        }
+        
+        .input-group {
+            position: relative;
+            margin-bottom: 25px;
+        }
+        
+        .input-group i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+            transition: all 0.3s;
+        }
+        
+        input[type="text"],
+        input[type="email"],
+        input[type="password"] {
+            width: 100%;
+            padding: 14px 14px 14px 45px;
+            background: rgba(30, 42, 68, 0.8);
+            border: 1px solid rgba(6, 182, 212, 0.1);
+            border-radius: 8px;
+            color: var(--text);
+            font-size: 15px;
+            transition: all 0.3s;
+            box-shadow: inset 0 1px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        input[type="text"]:focus,
+        input[type="email"]:focus,
+        input[type="password"]:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.2);
+        }
+        
+        input[type="text"]:focus + i,
+        input[type="email"]:focus + i,
+        input[type="password"]:focus + i {
+            color: var(--primary);
+            transform: translateY(-50%) scale(1.1);
+        }
+        
+        .btn-submit {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-hover));
+            color: #0f172a;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            margin-top: 15px;
+            transition: all 0.4s;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(6, 182, 212, 0.3);
+            z-index: 1;
+        }
+        
+        .btn-submit::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--primary-hover), #0e7490);
+            z-index: -1;
+            opacity: 0;
+            transition: opacity 0.4s;
+        }
+        
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(6, 182, 212, 0.4);
+        }
+        
+        .btn-submit:hover::before {
+            opacity: 1;
+        }
+        
+        .btn-submit:active {
+            transform: translateY(0);
+        }
+        
+        .btn-submit .icon {
+            margin-right: 8px;
+            transition: all 0.3s;
+        }
+        
+        .btn-submit.loading .icon {
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .btn-submit::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                to bottom right,
+                rgba(255, 255, 255, 0.4),
+                rgba(255, 255, 255, 0)
+            );
+            transform: rotate(30deg);
+            transition: all 0.6s;
+            z-index: 1;
+        }
+        
+        .btn-submit:hover::after {
+            left: 100%;
+            top: 100%;
+        }
+        
+        .btn-submit .text {
+            position: relative;
+            z-index: 2;
+        }
+        
+        .login-link {
+            text-align: center;
+            margin-top: 25px;
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+        
+        .login-link a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s;
+            position: relative;
+        }
+        
+        .login-link a::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 0;
+            height: 1px;
+            background: var(--primary);
+            transition: width 0.3s;
+        }
+        
+        .login-link a:hover::after {
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div class="signup-box">
+        <h2>Create Account</h2>
+        <form id="signupForm" action="/signup" method="post">
+            <div class="input-group">
+                <i class="fas fa-user"></i>
+                <input type="text" name="name" placeholder="Your Name" required>
+            </div>
+            <div class="input-group">
+                <i class="fas fa-envelope"></i>
+                <input type="email" name="email" placeholder="Email Address" required>
+            </div>
+            <div class="input-group">
+                <i class="fas fa-lock"></i>
+                <input type="password" name="password" placeholder="Create Password" required>
+            </div>
+            <button type="submit" class="btn-submit">
+                <span class="icon"><i class="fas fa-user-plus"></i></span>
+                <span class="text">Sign Up</span>
+            </button>
+        </form>
+        <div class="login-link">
+            Already have an account? <a href="/login">Login</a>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('signupForm').addEventListener('submit', function(e) {
+            const btn = document.querySelector('.btn-submit');
+            btn.classList.add('loading');
+            btn.disabled = true;
+            btn.querySelector('.text').textContent = 'Creating Account...';
+            
+            // Simulate loading (remove this in production)
+            setTimeout(() => {
+                btn.classList.remove('loading');
+                btn.disabled = false;
+                btn.querySelector('.text').textContent = 'Sign Up';
+            }, 2000);
+        });
+    </script>
+</body>
+</html>

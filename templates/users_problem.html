@@ -1,0 +1,954 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="purple">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ user.name }}'s Problems - CodeZone</title>
+    <link href="https://fonts.googleapis.com/css2?family=Exo:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            /* Neon Purple Theme */
+            --primary: #9333ea;
+            --secondary: #a855f7;
+            --glow: rgba(147, 51, 234, 0.4);
+            --glow-intense: rgba(147, 51, 234, 0.6);
+            --border: rgba(147, 51, 234, 0.2);
+            --bg-card: rgba(25, 30, 50, 0.8);
+            --bg-container: rgba(20, 25, 40, 0.7);
+            --bg-feedback: rgba(30, 35, 60, 0.8);
+            --bg-input: rgba(30, 35, 45, 0.8);
+            --gradient: linear-gradient(135deg, #9333ea, #a855f7);
+            --gradient-hover: linear-gradient(135deg, #7e22ce, #9333ea);
+            --scrollbar: linear-gradient(180deg, #9333ea, #a855f7);
+        }
+
+        [data-theme="blue"] {
+            /* Cyber Blue Theme */
+            --primary: #06b6d4;
+            --secondary: #22d3ee;
+            --glow: rgba(6, 182, 212, 0.4);
+            --glow-intense: rgba(6, 182, 212, 0.6);
+            --border: rgba(6, 182, 212, 0.2);
+            --bg-card: rgba(20, 40, 60, 0.8);
+            --bg-container: rgba(15, 30, 50, 0.7);
+            --bg-feedback: rgba(25, 45, 65, 0.8);
+            --bg-input: rgba(25, 35, 55, 0.8);
+            --gradient: linear-gradient(135deg, #06b6d4, #22d3ee);
+            --gradient-hover: linear-gradient(135deg, #0891b2, #06b6d4);
+            --scrollbar: linear-gradient(180deg, #06b6d4, #22d3ee);
+        }
+
+        body {
+            background: linear-gradient(135deg, #0a0e1a, #1a1e2f);
+            color: #d8dee9;
+            font-family: 'Exo', sans-serif;
+            min-height: 100vh;
+            line-height: 1.6;
+            overflow-x: hidden;
+            background-attachment: fixed;
+        }
+
+        /* === Navbar === */
+        .navbar {
+            background: rgba(10, 14, 26, 0.85);
+            padding: 15px 40px;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(15px);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .navbar h2 {
+            font-size: 2rem;
+            font-weight: 700;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: 1px;
+        }
+
+        .navbar-nav {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+        }
+
+        .navbar a {
+            color: #d8dee9;
+            text-decoration: none;
+            font-size: 1rem;
+            font-weight: 500;
+            position: relative;
+            padding: 10px 15px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .navbar a:hover {
+            color: var(--secondary);
+            text-shadow: 0 0 8px var(--glow);
+        }
+
+        .navbar a::after {
+            content: '';
+            position: absolute;
+            bottom: 5px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 2px;
+            background: var(--gradient);
+            transition: width 0.3s ease;
+            border-radius: 2px;
+        }
+
+        .navbar a:hover::after {
+            width: 80%;
+        }
+
+        /* === Theme Toggle === */
+        .theme-toggle {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .theme-toggle input {
+            display: none;
+        }
+
+        .theme-toggle-label {
+            width: 50px;
+            height: 24px;
+            background: rgba(30, 35, 60, 0.8);
+            border: 2px solid var(--border);
+            border-radius: 24px;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 8px var(--glow);
+        }
+
+        .theme-toggle-label::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 18px;
+            height: 18px;
+            background: var(--primary);
+            border-radius: 50%;
+            transition: transform 0.3s ease, background 0.3s ease;
+            box-shadow: 0 0 5px var(--glow);
+        }
+
+        .theme-toggle input:checked + .theme-toggle-label::after {
+            transform: translateX(26px);
+            background: var(--secondary);
+        }
+
+        .theme-toggle input:checked + .theme-toggle-label {
+            border-color: var(--secondary);
+            box-shadow: 0 0 10px var(--glow-intense);
+        }
+
+        /* === Dropdown === */
+        .dropdown {
+            position: relative;
+        }
+
+        .dropdown-toggle {
+            cursor: pointer;
+            color: #d8dee9;
+            font-size: 1rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 20px;
+            border-radius: 25px;
+            background: var(--border);
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 10px var(--glow);
+        }
+
+        .dropdown-toggle:hover {
+            background: rgba(147, 51, 234, 0.2);
+            color: var(--secondary);
+            box-shadow: 0 4px 15px var(--glow-intense);
+            text-shadow: 0 0 5px var(--glow);
+        }
+
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            right: 0;
+            top: 110%;
+            background: rgba(10, 14, 26, 0.9);
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            min-width: 200px;
+            z-index: 1001;
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border);
+            overflow: hidden;
+        }
+
+        .dropdown-menu.active {
+            display: block;
+            animation: scaleIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .dropdown-menu a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 20px;
+            color: #d8dee9;
+            font-size: 0.95rem;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .dropdown-menu a:last-child {
+            border-bottom: none;
+        }
+
+        .dropdown-menu a:hover {
+            background: var(--border);
+            color: var(--secondary);
+            padding-left: 25px;
+            text-shadow: 0 0 5px var(--glow);
+        }
+
+        .dropdown-menu a i {
+            font-size: 1rem;
+            width: 20px;
+            text-align: center;
+        }
+
+        /* === Container === */
+        .container {
+            max-width: 1100px;
+            margin: 100px auto 40px;
+            padding: 30px;
+            background: var(--bg-container);
+            border-radius: 20px;
+            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border);
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            margin-bottom: 30px;
+            color: #d8dee9;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            text-shadow: 0 0 10px var(--glow);
+        }
+
+        h1::before {
+            content: '';
+            width: 8px;
+            height: 35px;
+            background: var(--gradient);
+            border-radius: 4px;
+        }
+
+        /* === Problem Cards === */
+        .problem-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px; /* Reduced from 25px */
+        }
+
+        .problem-card {
+            background: var(--bg-card);
+            border-radius: 14px; /* Slightly smaller */
+            padding: 20px; /* Reduced from 30px */
+            display: flex;
+            flex-direction: column;
+            gap: 15px; /* Reduced from 20px */
+            border: 2px solid var(--border);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .problem-card:hover {
+            transform: translateY(-8px); /* Slightly less lift */
+            border-color: var(--secondary);
+            box-shadow: 0 10px 40px var(--glow);
+            background: rgba(25, 30, 50, 0.9);
+        }
+
+        .problem-card::after {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            border-radius: 14px;
+            background: var(--gradient);
+            z-index: -1;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        .problem-card:hover::after {
+            opacity: 0.3;
+        }
+
+        .problem-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px; /* Reduced from 10px */
+        }
+
+        .problem-id {
+            background: var(--border);
+            color: var(--secondary);
+            padding: 6px 12px; /* Smaller */
+            border-radius: 6px;
+            font-size: 0.85rem; /* Reduced from 0.9rem */
+            font-weight: 500;
+            box-shadow: 0 2px 6px var(--glow);
+        }
+
+        .problem-title {
+            font-size: 1.3rem; /* Reduced from 1.4rem */
+            font-weight: 600;
+            color: #d8dee9;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-shadow: 0 0 5px var(--glow);
+        }
+
+        .problem-title i {
+            color: var(--secondary);
+            font-size: 1.1rem; /* Slightly smaller */
+        }
+
+        .problem-difficulty {
+            padding: 6px 12px; /* Smaller */
+            border-radius: 6px;
+            font-size: 0.85rem; /* Reduced from 0.9rem */
+            font-weight: 500;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+        }
+
+        .difficulty-easy {
+            background: rgba(34, 197, 94, 0.2);
+            color: #22c55e;
+            border: 1px solid rgba(34, 197, 94, 0.3);
+        }
+
+        .difficulty-medium {
+            background: rgba(234, 179, 8, 0.2);
+            color: #eab308;
+            border: 1px solid rgba(234, 179, 8, 0.3);
+        }
+
+        .difficulty-hard {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .problem-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px; /* Reduced from 10px */
+            margin: 10px 0; /* Reduced from 15px */
+        }
+
+        .tag {
+            background: var(--border);
+            color: var(--secondary);
+            padding: 5px 10px; /* Smaller */
+            border-radius: 6px;
+            font-size: 0.8rem; /* Reduced from 0.85rem */
+            font-weight: 500;
+            border: 1px solid var(--border);
+            transition: all 0.3s ease;
+        }
+
+        .tag:hover {
+            background: rgba(147, 51, 234, 0.3);
+            transform: scale(1.1);
+            box-shadow: 0 0 8px var(--glow);
+        }
+
+        .problem-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9rem; /* Reduced from 0.95rem */
+            color: #94a3b8;
+            margin: 8px 0; /* Reduced from 10px */
+        }
+
+        .problem-meta span {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .problem-meta i {
+            color: var(--secondary);
+            font-size: 0.95rem; /* Slightly smaller */
+        }
+
+        .action-btn {
+            padding: 8px 20px;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            border: 2px solid var(--primary);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            background: var(--gradient);
+            color: #fff;
+            box-shadow: 0 0 10px var(--glow);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .action-btn::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: 0.5s ease;
+        }
+
+        .action-btn:hover::after {
+            left: 100%;
+        }
+
+        .action-btn:hover {
+            background: var(--gradient-hover);
+            transform: translateY(-3px);
+            box-shadow: 0 0 15px var(--glow-intense);
+            border-color: var(--secondary);
+        }
+
+        /* === Feedback Section === */
+        .feedback-section {
+            margin-top: 20px; /* Reduced from 25px */
+            padding-top: 15px; /* Reduced from 20px */
+            border-top: 1px solid var(--border);
+        }
+
+        .feedback-section h4 {
+            font-size: 1.1rem; /* Reduced from 1.2rem */
+            color: #d8dee9;
+            margin-bottom: 12px; /* Reduced from 15px */
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+            text-shadow: 0 0 5px var(--glow);
+        }
+
+        .feedback-section h4 i {
+            color: var(--secondary);
+            font-size: 1.1rem; /* Slightly smaller */
+        }
+
+        .feedback-item {
+            background: var(--bg-feedback);
+            padding: 15px; /* Reduced from 20px */
+            border-radius: 10px; /* Slightly smaller */
+            margin-bottom: 12px; /* Reduced from 15px */
+            border: 1px solid var(--border);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .feedback-item:hover {
+            transform: translateY(-4px); /* Slightly less lift */
+            box-shadow: 0 6px 20px var(--glow);
+            border-color: var(--secondary);
+        }
+
+        .feedback-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .feedback-user {
+            font-weight: 600;
+            color: var(--secondary);
+            font-size: 0.9rem; /* Reduced from 0.95rem */
+        }
+
+        .feedback-time {
+            font-size: 0.8rem; /* Reduced from 0.85rem */
+            color: #64748b;
+        }
+
+        .feedback-content {
+            font-size: 0.9rem; /* Reduced from 0.95rem */
+            color: #d8dee9;
+            line-height: 1.5;
+        }
+
+        .feedback-form {
+            display: flex;
+            flex-direction: column;
+            gap: 12px; /* Reduced from 15px */
+            margin-top: 15px; /* Reduced from 20px */
+        }
+
+        .feedback-form textarea {
+            padding: 12px 15px; /* Smaller */
+            background: var(--bg-input);
+            color: #d8dee9;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            font-size: 0.9rem; /* Reduced from 0.95rem */
+            outline: none;
+            transition: all 0.3s ease;
+            resize: vertical;
+            min-height: 80px; /* Reduced from 100px */
+            box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .feedback-form textarea:focus {
+            border-color: var(--secondary);
+            box-shadow: 0 0 10px var(--glow);
+        }
+
+        .feedback-form button {
+            padding: 10px 20px; /* Slightly smaller */
+            background: linear-gradient(135deg, #22c55e, #4ade80);
+            color: #fff;
+            border: 2px solid #22c55e;
+            border-radius: 8px;
+            font-size: 0.9rem; /* Reduced from 0.95rem */
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            align-self: flex-start;
+            box-shadow: 0 0 10px rgba(34, 197, 94, 0.4);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feedback-form button::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: 0.5s ease;
+        }
+
+        .feedback-form button:hover::after {
+            left: 100%;
+        }
+
+        .feedback-form button:hover {
+            background: linear-gradient(135deg, #16a34a, #22c55e);
+            transform: translateY(-3px);
+            box-shadow: 0 0 15px rgba(34, 197, 94, 0.6);
+            border-color: #4ade80;
+        }
+
+        .error {
+            color: #ef4444;
+            background: rgba(239, 68, 68, 0.2);
+            padding: 10px; /* Smaller */
+            border-radius: 8px;
+            margin-bottom: 12px; /* Reduced from 15px */
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            font-size: 0.9rem; /* Reduced from 0.95rem */
+            box-shadow: 0 2px 6px rgba(239, 68, 68, 0.2);
+        }
+
+        /* === Animations === */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); } /* Smaller translate */
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes scaleIn {
+            from { opacity: 0; transform: scale(0.8); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        /* === Scrollbars === */
+        .container::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .container::-webkit-scrollbar-track {
+            background: rgba(20, 25, 40, 0.5);
+            border-radius: 4px;
+        }
+
+        .container::-webkit-scrollbar-thumb {
+            background: var(--scrollbar);
+            border-radius: 4px;
+        }
+
+        .container:hover::-webkit-scrollbar-thumb {
+            background: var(--scrollbar);
+        }
+
+        .container {
+            scrollbar-width: thin;
+            scrollbar-color: var(--primary) rgba(20, 25, 40, 0.5);
+        }
+
+        /* === Responsive Design === */
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 15px 20px;
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .navbar-nav {
+                width: 100%;
+                justify-content: space-between;
+                flex-wrap: wrap;
+            }
+
+            .container {
+                margin: 90px 20px 30px;
+                padding: 20px;
+            }
+
+            .problem-card {
+                padding: 15px; /* Further reduced for mobile */
+            }
+
+            .problem-card-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+
+            .problem-meta {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 1.8rem;
+            }
+
+            .problem-title {
+                font-size: 1.1rem;
+            }
+
+            .action-btn {
+                padding: 7px 15px;
+                font-size: 0.9rem;
+            }
+
+            .feedback-form button {
+                width: 100%;
+                align-self: stretch;
+            }
+
+            .problem-id, .problem-difficulty, .tag {
+                font-size: 0.75rem;
+                padding: 5px 8px;
+            }
+
+            .theme-toggle-label {
+                width: 40px;
+                height: 20px;
+            }
+
+            .theme-toggle-label::after {
+                width: 16px;
+                height: 16px;
+            }
+
+            .theme-toggle input:checked + .theme-toggle-label::after {
+                transform: translateX(20px);
+            }
+        }
+
+        /* === Premium Font === */
+body {
+    font-family: 'Inter', sans-serif;
+    letter-spacing: 0.2px;
+}
+
+/* === Elegant Card Look === */
+.problem-card {
+    background: rgba(10, 14, 26, 0.6);
+    backdrop-filter: blur(25px);
+    border: 1px solid var(--border);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
+}
+
+/* === Hover Improvements === */
+.problem-card:hover {
+    transform: scale(1.02);
+    box-shadow: 0 12px 40px var(--glow);
+}
+
+.action-btn:hover::after {
+    animation: shine 1.5s ease infinite;
+}
+
+@keyframes shine {
+    0% { left: -100%; }
+    100% { left: 100%; }
+}
+.skeleton-card {
+    height: 220px;
+    border-radius: 14px;
+    background: linear-gradient(110deg, #1a1e2f 8%, #2a2f40 18%, #1a1e2f 33%);
+    background-size: 1000% 100%;
+    animation: shimmer 2.2s infinite;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+}
+
+@keyframes shimmer {
+    0% { background-position: -1000px 0; }
+    100% { background-position: 1000px 0; }
+}
+
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <div class="navbar">
+        <h2>CodeZone 🚀</h2>
+        <div class="navbar-nav">
+            <a href="/dashboard">Home</a>
+            <a href="/problems">Problems</a>
+            <a href="/post_problem">Post Problem</a>
+            <div class="theme-toggle">
+                <input type="checkbox" id="theme-toggle" aria-label="Toggle Theme">
+                <label for="theme-toggle" class="theme-toggle-label"></label>
+            </div>
+            <div class="dropdown">
+                <span class="dropdown-toggle">👋 {{ session.user_name }}</span>
+                <div class="dropdown-menu">
+                    <a href="/edit-profile"><i class="fas fa-user-edit"></i> Edit Profile</a>
+                    <a href="/logout" style="color: #ef4444;"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container">
+        <h1><i class="fas fa-user"></i> {{ user.name }}'s Problems</h1>
+        <div id="loading-skeleton" class="problem-grid">
+            <div class="skeleton-card"></div>
+            <div class="skeleton-card"></div>
+            <div class="skeleton-card"></div>
+        </div>
+        
+        <!-- Actual Problems (hidden initially) -->
+        {% if problems %}
+        <div id="real-problems" class="problem-grid" style="display: none;">
+            {% for problem in problems %}
+            <div class="problem-card">
+                <div class="problem-card-header">
+                    <div class="problem-id">#{{ problem.id }}</div>
+                    <div class="problem-difficulty difficulty-{{ problem.difficulty|lower }}">
+                        {{ problem.difficulty }}
+                    </div>
+                </div>
+        
+                <h4 class="problem-title">
+                    <i class="fas fa-puzzle-piece"></i>
+                    {{ problem.title }}
+                </h4>
+        
+                {% if problem.tags %}
+                <div class="problem-tags">
+                    {% for tag in problem.tags.split(',') %}
+                    <span class="tag">{{ tag.strip() }}</span>
+                    {% endfor %}
+                </div>
+                {% endif %}
+        
+                <div class="problem-meta">
+                    <span><i class="fas fa-clock"></i> Posted: {{ problem.created_at }}</span>
+                    <a href="/problems/{{ problem.id }}" class="action-btn">
+                        <i class="fas fa-play"></i> Solve
+                    </a>
+                </div>
+
+                <!-- Feedback Section -->
+                <div class="feedback-section">
+                    <h4><i class="fas fa-comment"></i> Feedback</h4>
+                    {% if problem.feedback %}
+                    {% for fb in problem.feedback %}
+                    <div class="feedback-item">
+                        <div class="feedback-header">
+                            <span class="feedback-user">{{ fb.user_name }}</span>
+                            <span class="feedback-time">{{ fb.created_at }}</span>
+                        </div>
+                        <div class="feedback-content">{{ fb.feedback }}</div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div style="text-align: center; color: #94a3b8; font-size: 1.1rem; padding: 20px;">
+                    <!-- No problems posted by {{ user.name }} yet. -->
+                </div>
+                {% endif %}
+
+                    <form class="feedback-form" data-problem-id="{{ problem.id }}">
+                        <textarea name="feedback" placeholder="Write your feedback..." required></textarea>
+                        <button type="submit">Submit Feedback</button>
+                        <div class="error" style="display: none;"></div>
+                    </form>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div style="text-align: center; color: #94a3b8; font-size: 1.1rem; padding: 20px;">
+            No problems posted by {{ user.name }} yet.
+        </div>
+        {% endif %}
+    </div>
+
+    <script>
+        // Theme Toggle
+        document.addEventListener('DOMContentLoaded', function() {
+            const themeToggle = document.getElementById('theme-toggle');
+            const html = document.documentElement;
+
+            // Load saved theme from localStorage
+            const savedTheme = localStorage.getItem('theme') || 'purple';
+            html.setAttribute('data-theme', savedTheme);
+            if (savedTheme === 'blue') {
+                themeToggle.checked = true;
+            }
+
+            // Toggle theme on change
+            themeToggle.addEventListener('change', () => {
+                const newTheme = themeToggle.checked ? 'blue' : 'purple';
+                html.setAttribute('data-theme', newTheme);
+                localStorage.setItem('theme', newTheme);
+            });
+
+            // Dropdown Toggle
+            const dropdownToggle = document.querySelector('.dropdown-toggle');
+            const dropdownMenu = document.querySelector('.dropdown-menu');
+
+            dropdownToggle.addEventListener('click', () => {
+                dropdownMenu.classList.toggle('active');
+            });
+
+            document.addEventListener('click', (e) => {
+                if (!dropdownToggle.contains(e.target) && !dropdownMenu.contains(e.target)) {
+                    dropdownMenu.classList.remove('active');
+                }
+            });
+
+            // Feedback Form Submission
+            document.querySelectorAll('.feedback-form').forEach(form => {
+                form.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    const problemId = form.dataset.problemId;
+                    const feedback = form.querySelector('textarea').value.trim();
+                    const errorDiv = form.querySelector('.error');
+
+                    if (!feedback) {
+                        errorDiv.textContent = 'Feedback cannot be empty.';
+                        errorDiv.style.display = 'block';
+                        return;
+                    }
+
+                    try {
+                        const response = await fetch(`/post_feedback/${problemId}`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded',
+                            },
+                            body: `feedback=${encodeURIComponent(feedback)}`
+                        });
+                        const result = await response.json();
+
+                        if (result.status === 'success') {
+                            const feedbackSection = form.previousElementSibling;
+                            const noFeedback = feedbackSection.querySelector('div[style*="color: #94a3b8"]');
+                            if (noFeedback) {
+                                noFeedback.remove();
+                            }
+
+                            const feedbackItem = document.createElement('div');
+                            feedbackItem.className = 'feedback-item';
+                            feedbackItem.innerHTML = `
+                                <div class="feedback-header">
+                                    <span class="feedback-user">${result.feedback.user_name}</span>
+                                    <span class="feedback-time">${result.feedback.created_at}</span>
+                                </div>
+                                <div class="feedback-content">${result.feedback.feedback}</div>
+                            `;
+                            feedbackSection.insertBefore(feedbackItem, feedbackSection.firstChild);
+
+                            form.querySelector('textarea').value = '';
+                            errorDiv.style.display = 'none';
+                        } else {
+                            errorDiv.textContent = result.message;
+                            errorDiv.style.display = 'block';
+                        }
+                    } catch (error) {
+                        errorDiv.textContent = 'Failed to submit feedback. Please try again.';
+                        errorDiv.style.display = 'block';
+                    }
+                });
+            });
+        });
+
+        window.addEventListener('DOMContentLoaded', () => {
+    setTimeout(() => {
+        document.getElementById('loading-skeleton').style.display = 'none';
+        document.getElementById('real-problems').style.display = 'grid';
+    }, 1000);
+});
+    </script>
+</body>
+</html>

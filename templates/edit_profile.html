@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Profile - CodeZone</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background: linear-gradient(135deg, #0c1a2b, #0f172a);
+    color: #e2e8f0;
+    font-family: 'Inter', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    background-attachment: fixed;
+    font-smooth: always;
+    -webkit-font-smoothing: antialiased;
+}
+
+.form-container {
+    width: 100%;
+    max-width: 500px;
+    background: rgba(30, 42, 68, 0.85);
+    backdrop-filter: blur(14px) saturate(160%);
+    -webkit-backdrop-filter: blur(14px) saturate(160%);
+    border-radius: 20px;
+    padding: 45px;
+    box-shadow: 0 20px 45px rgba(0, 0, 0, 0.4), inset 0 0 2px rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(6, 182, 212, 0.25);
+    position: relative;
+    overflow: hidden;
+    animation: fadeInUp 0.6s ease-out;
+    transition: all 0.3s ease-in-out;
+}
+
+.form-container:hover {
+    transform: scale(1.01);
+    box-shadow: 0 30px 60px rgba(6, 182, 212, 0.1);
+}
+
+.form-container::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(6, 182, 212, 0.15) 0%, transparent 70%);
+    transform: rotate(30deg);
+    pointer-events: none;
+    animation: shine 10s infinite linear;
+}
+
+h3 {
+    color: #06b6d4;
+    font-size: 2rem;
+    margin-bottom: 30px;
+    font-weight: 700;
+    text-align: center;
+    position: relative;
+    display: inline-block;
+    width: 100%;
+    text-shadow: 0 2px 8px rgba(6, 182, 212, 0.3);
+}
+
+h3::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80px;
+    height: 4px;
+    background: linear-gradient(90deg, #06b6d4, #22d3ee);
+    border-radius: 3px;
+}
+
+.form-group {
+    margin-bottom: 25px;
+    position: relative;
+}
+
+label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #cbd5e1;
+    font-size: 0.98rem;
+}
+
+input {
+    width: 100%;
+    padding: 14px 18px;
+    background: rgba(30, 42, 68, 0.65);
+    color: #e2e8f0;
+    border: 1px solid rgba(6, 182, 212, 0.35);
+    border-radius: 12px;
+    font-size: 1.05rem;
+    transition: all 0.3s ease;
+    outline: none;
+    box-shadow: inset 0 0 0 transparent;
+}
+
+input:focus {
+    border-color: #06b6d4;
+    box-shadow: 0 0 12px rgba(6, 182, 212, 0.3), inset 0 0 6px rgba(6, 182, 212, 0.2);
+    background: rgba(30, 42, 68, 0.95);
+}
+
+input::placeholder {
+    color: #64748b;
+    font-style: italic;
+}
+
+.button-group {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 40px;
+}
+
+button {
+    position: relative;
+    padding: 14px 30px;
+    background: linear-gradient(135deg, #06b6d4, #3ccbe0);
+    color: #0c1a2b;
+    border: none;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    box-shadow: 0 6px 20px rgba(6, 182, 212, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    letter-spacing: 0.4px;
+}
+
+button:hover {
+    transform: translateY(-2px) scale(1.01);
+    box-shadow: 0 12px 30px rgba(6, 182, 212, 0.4);
+}
+
+button:active {
+    transform: scale(0.98);
+    box-shadow: 0 4px 10px rgba(6, 182, 212, 0.2);
+}
+
+button::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.25), transparent);
+    transition: 0.6s;
+}
+
+button:hover::after {
+    left: 100%;
+}
+
+.back-link {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #06b6d4;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.back-link:hover {
+    color: #22d3ee;
+    transform: translateX(-3px);
+    text-shadow: 0 1px 2px rgba(6, 182, 212, 0.2);
+}
+
+.success-message {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: linear-gradient(135deg, #10b981, #34d399);
+    color: #0c1a2b;
+    padding: 16px 26px;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(16, 185, 129, 0.35);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-weight: 600;
+    transform: translateX(150%);
+    transition: transform 0.5s ease;
+    z-index: 100;
+    font-size: 0.95rem;
+}
+
+.success-message.show {
+    transform: translateX(0);
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes shine {
+    0% {
+        transform: rotate(30deg) translate(-15%, -15%);
+    }
+    100% {
+        transform: rotate(30deg) translate(15%, 15%);
+    }
+}
+
+@media (max-width: 576px) {
+    .form-container {
+        padding: 35px 24px;
+    }
+
+    .button-group {
+        flex-direction: column-reverse;
+        gap: 16px;
+    }
+
+    button {
+        width: 100%;
+    }
+}
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <h3><i class="fas fa-user-edit"></i> Edit Profile</h3>
+        <form method="POST" id="profileForm">
+            <div class="form-group">
+                <label for="name">Your Name</label>
+                <input type="text" id="name" name="name" value="{{ name }}" required autofocus>
+            </div>
+            
+            <div class="button-group">
+                <a href="/dashboard" class="back-link">
+                    <i class="fas fa-arrow-left"></i> Back to Dashboard
+                </a>
+                <button type="submit" id="saveBtn">
+                    <i class="fas fa-save"></i> Save Changes
+                </button>
+            </div>
+        </form>
+    </div>
+    
+    <div class="success-message" id="successMessage">
+        <i class="fas fa-check-circle"></i>
+        Profile updated successfully!
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('profileForm');
+            const saveBtn = document.getElementById('saveBtn');
+            const successMessage = document.getElementById('successMessage');
+            
+            // Form submission handler
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                // Show loading state
+                saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+                saveBtn.disabled = true;
+                
+                // Simulate API call (replace with actual form submission)
+                setTimeout(() => {
+                    // Show success message
+                    successMessage.classList.add('show');
+                    
+                    // Reset button state
+                    saveBtn.innerHTML = '<i class="fas fa-save"></i> Save Changes';
+                    saveBtn.disabled = false;
+                    
+                    // Hide success message after 3 seconds
+                    setTimeout(() => {
+                        successMessage.classList.remove('show');
+                    }, 3000);
+                    
+                    // Actually submit the form (remove this in real implementation)
+                    form.submit();
+                }, 1500);
+            });
+            
+            // Ripple effect for button
+            saveBtn.addEventListener('click', function(e) {
+                const rect = this.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                
+                const ripple = document.createElement('span');
+                ripple.className = 'ripple';
+                ripple.style.left = `${x}px`;
+                ripple.style.top = `${y}px`;
+                
+                this.appendChild(ripple);
+                
+                setTimeout(() => {
+                    ripple.remove();
+                }, 1000);
+            });
+            
+            // Add floating animation to the form container
+            let floating = true;
+            const formContainer = document.querySelector('.form-container');
+            
+            function floatAnimation() {
+                if (floating) {
+                    formContainer.style.transform = 'translateY(-5px)';
+                    setTimeout(() => {
+                        formContainer.style.transform = 'translateY(5px)';
+                        setTimeout(floatAnimation, 2000);
+                    }, 2000);
+                }
+            }
+            
+            floatAnimation();
+            
+            // Stop floating when mouse enters
+            formContainer.addEventListener('mouseenter', () => {
+                floating = false;
+                formContainer.style.transform = 'translateY(0)';
+            });
+            
+            // Resume floating when mouse leaves
+            formContainer.addEventListener('mouseleave', () => {
+                floating = true;
+                floatAnimation();
+            });
+        });
+    </script>
+</body>
+</html>
