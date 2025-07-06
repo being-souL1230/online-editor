@@ -1,6 +1,6 @@
 # 💻 Online Code Editor & Practice Platform
 
-A full-featured LeetCode-style web application built using Flask, MySQL, HTML/CSS/JS, and Judge0 API. Users can solve problems, submit code, track streaks, accuracy, and even view other users' challenges and feedback.
+A full-featured LeetCode-style web application built using Flask, MySQL, HTML/CSS/JS, and Judge0 API. Users can solve problems, submit code, track streaks, accuracy, and even view other user's challenges and feedback.
 
 ---
 
