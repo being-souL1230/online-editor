@@ -15,7 +15,7 @@ A full-featured LeetCode-style web application built using Flask, MySQL, HTML/CS
 -  View personal code snippets
 -  Filter by tags/difficulty
 -  Local server-side code execution (Python, C, C++)
-- 🛠 Admin/utility scripts for database and debugging
+-  Admin/utility scripts for database and debugging
 
 ---
 
