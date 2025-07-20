@@ -147,5 +147,64 @@ During development, several real-world issues were encountered and solved with c
 
 ---
 
-## 💡 Pro Tip
-Keep your admin scripts handy! They save hours of debugging and make your platform robust and easy to maintain.
+## 📸 Screenshots
+
+### Dashboard
+![Dashboard](screenshots/dashboard.png)
+
+### Problem Posting
+![Problem Posting](screenshots/problem_post.png)
+
+### Code Execution
+![Code Execution](screenshots/code_execution.png)
+
+---
+
+## **Step-by-Step: Add Screenshots to Your GitHub Project**
+
+### 1. **Screenshots Folder Banao**
+Project root me ek folder banao, jaise:
+```
+screenshots/
+```
+Isme apne screenshots (PNG/JPG) daal do, e.g.:
+- `screenshots/dashboard.png`
+- `screenshots/problem_post.png`
+- `screenshots/code_execution.png`
+
+### 2. **Screenshots ko Git me Add Karo**
+```bash
+git add screenshots/
+git commit -m "Add project screenshots"
+git push origin main
+```
+
+### 3. **README.md Me Screenshots Dikhana**
+README.md me jahan dikhana hai, wahan ye markdown use karo:
+
+```markdown
+<code_block_to_apply_changes_from>
+```
+
+- **Tip:** Screenshot ka naam aur path sahi hona chahiye (case-sensitive).
+
+### 4. **Push README Changes**
+```bash
+git add README.md
+git commit -m "Add screenshots section to README"
+git push origin main
+```
+
+---
+
+## **Summary Table**
+
+| Step                | Command/Action                                  |
+|---------------------|-------------------------------------------------|
+| Folder banao        | `mkdir screenshots`                             |
+| Screenshot daalo    | (copy-paste images in folder)                   |
+| Git add/commit/push | `git add screenshots/` ...                      |
+| README update       | Markdown image syntax (upar diya hai)           |
+| Push README         | `git add README.md && git commit ... && push`   |
+
+---
