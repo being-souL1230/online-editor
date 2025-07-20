@@ -1,25 +1,25 @@
-# 💻 Online Code Editor & Practice Platform
+#  Online Code Editor & Practice Platform
 
 A full-featured LeetCode-style web application built using Flask, MySQL, HTML/CSS/JS, and a secure local code execution engine (Python, C, C++). Users can solve problems, submit code, track streaks, accuracy, and even view other user's challenges and feedback. Flexible output checkers and admin scripts make it easy to manage and extend.
 
 ---
 
-## 🚀 Features
+##  Features
 
-- 🧠 User Auth (signup/login)
-- 📝 Code editor with syntax highlighting
-- 🧪 Problem submission and solving with flexible validation (exact, ignore whitespace, multiple outputs, custom checker)
-- ⏱️ Timer system with pause/resume
-- 📊 Leaderboard with score, accuracy, rank
-- 💬 Feedback/comment system on problems
-- 🧾 View personal code snippets
-- 🔍 Filter by tags/difficulty
-- ⚡ Local server-side code execution (Python, C, C++)
-- 🛠️ Admin/utility scripts for database and debugging
+-  User Auth (signup/login)
+-  Code editor with syntax highlighting
+-  Problem submission and solving with flexible validation (exact, ignore whitespace, multiple outputs, custom checker)
+-  Timer system with pause/resume
+-  Leaderboard with score, accuracy, rank
+-  Feedback/comment system on problems
+-  View personal code snippets
+-  Filter by tags/difficulty
+-  Local server-side code execution (Python, C, C++)
+-  Admin/utility scripts for database and debugging
 
 ---
 
-## 🧰 Tech Stack
+##  Tech Stack
 
 - Flask (Python backend)
 - MySQL (data storage)
@@ -30,7 +30,7 @@ A full-featured LeetCode-style web application built using Flask, MySQL, HTML/CS
 
 ---
 
-## ⚙️ Installation Guide
+##  Installation Guide
 
 ### 1. Clone the Repository
 
@@ -75,7 +75,7 @@ python app.py
 
 ---
 
-## 🛠️ Problems & Solutions During Development
+## Problems & Solutions During Development
 
 During development, several real-world issues were encountered and solved with custom scripts and code improvements. Here are the main problems and how they were addressed:
 
@@ -114,14 +114,9 @@ During development, several real-world issues were encountered and solved with c
   - **`quick_test.py`**: Runs sample code in all supported languages to verify execution.
   - **`test_execution.py`**: More comprehensive execution system tests.
 
-### **7. Pycache/Venv Folder Issues**
-- **Problem:** Unwanted files/folders tracked by git.
-- **Solution:**
-  - **`.gitignore`**: Now includes `__pycache__/` and `venv/` to keep the repo clean.
-
 ---
 
-## 📦 Project Structure (Key Files)
+## Project Structure (Key Files)
 - `app.py` — Main Flask app
 - `code_executor.py` — Local code execution engine
 - `insert_dummy_problems.py` — Insert test problems
@@ -132,11 +127,10 @@ During development, several real-world issues were encountered and solved with c
 - `debug_language_ids.py` — Language ID debug tool
 - `check_database_schema.py` — Print DB schema
 - `dummy_problems.sql` — SQL for test problems
-- `.gitignore` — Ignore venv, pycache, etc.
 
 ---
 
-## 📝 What to Do If You Face Issues
+## What to Do If You Face Issues
 - **Database errors:** Run `migrate_database.py` or `fix_database_constraints.py`.
 - **Schema mismatch:** Use `check_database_schema.py` to debug.
 - **Dummy data needed:** Run `insert_dummy_problems.py`.
@@ -144,67 +138,5 @@ During development, several real-world issues were encountered and solved with c
 - **Output checker issues:** Use `test_checker_types.py`.
 - **Language ID issues:** Use `debug_language_ids.py`.
 - **Unwanted files in git:** Update `.gitignore` and run `git rm --cached <file>`.
-
----
-
-## 📸 Screenshots
-
-### Dashboard
-![Dashboard](screenshots/dashboard.png)
-
-### Problem Posting
-![Problem Posting](screenshots/problem_post.png)
-
-### Code Execution
-![Code Execution](screenshots/code_execution.png)
-
----
-
-## **Step-by-Step: Add Screenshots to Your GitHub Project**
-
-### 1. **Screenshots Folder Banao**
-Project root me ek folder banao, jaise:
-```
-screenshots/
-```
-Isme apne screenshots (PNG/JPG) daal do, e.g.:
-- `screenshots/dashboard.png`
-- `screenshots/problem_post.png`
-- `screenshots/code_execution.png`
-
-### 2. **Screenshots ko Git me Add Karo**
-```bash
-git add screenshots/
-git commit -m "Add project screenshots"
-git push origin main
-```
-
-### 3. **README.md Me Screenshots Dikhana**
-README.md me jahan dikhana hai, wahan ye markdown use karo:
-
-```markdown
-<code_block_to_apply_changes_from>
-```
-
-- **Tip:** Screenshot ka naam aur path sahi hona chahiye (case-sensitive).
-
-### 4. **Push README Changes**
-```bash
-git add README.md
-git commit -m "Add screenshots section to README"
-git push origin main
-```
-
----
-
-## **Summary Table**
-
-| Step                | Command/Action                                  |
-|---------------------|-------------------------------------------------|
-| Folder banao        | `mkdir screenshots`                             |
-| Screenshot daalo    | (copy-paste images in folder)                   |
-| Git add/commit/push | `git add screenshots/` ...                      |
-| README update       | Markdown image syntax (upar diya hai)           |
-| Push README         | `git add README.md && git commit ... && push`   |
 
 ---
