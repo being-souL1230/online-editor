@@ -461,8 +461,8 @@ def run_code():
                         FROM problems 
                         WHERE id = %s
                     """, (problem_id,))
-                problem = cursor.fetchone()
-                expected_output = problem['expected_output'] if problem else None
+                    problem = cursor.fetchone()
+                    expected_output = problem['expected_output'] if problem else None
                     checker_type = 'exact'  # Default to exact matching
                     custom_checker_code = None
 
@@ -667,6 +667,7 @@ def submit_solution(problem_id):
         print(f"Execution error: {str(e)}")
         return jsonify({"status": "Error", "output": f"Execution error: {str(e)}"}), 500
     
+    # In submit_solution, fix the try block for fetching problem details
     connection = get_db_connection()
     try:
         with connection.cursor() as cursor:
@@ -677,12 +678,11 @@ def submit_solution(problem_id):
                     FROM problems 
                     WHERE id = %s
                 """, (problem_id,))
-            problem = cursor.fetchone()
-            if not problem:
-                print(f"Error: Problem ID {problem_id} not found")
-                return jsonify({'status': 'error', 'message': 'Problem not found'}), 404
-                
-            expected_output = problem['expected_output']
+                problem = cursor.fetchone()
+                if not problem:
+                    print(f"Error: Problem ID {problem_id} not found")
+                    return jsonify({'status': 'error', 'message': 'Problem not found'}), 404
+                expected_output = problem['expected_output']
                 checker_type = problem.get('checker_type', 'exact')
                 custom_checker_code = problem.get('custom_checker_code')
             except Exception as db_error:
@@ -697,7 +697,6 @@ def submit_solution(problem_id):
                 if not problem:
                     print(f"Error: Problem ID {problem_id} not found")
                     return jsonify({'status': 'error', 'message': 'Problem not found'}), 404
-                
                 expected_output = problem['expected_output']
                 checker_type = 'exact'  # Default to exact matching
                 custom_checker_code = None
