@@ -114,11 +114,6 @@ During development, several real-world issues were encountered and solved with c
   - **`quick_test.py`**: Runs sample code in all supported languages to verify execution.
   - **`test_execution.py`**: More comprehensive execution system tests.
 
-### **7. Pycache/Venv Folder Issues**
-- **Problem:** Unwanted files/folders tracked by git.
-- **Solution:**
-  - **`.gitignore`**: Now includes `__pycache__/` and `venv/` to keep the repo clean.
-
 ---
 
 ## 📦 Project Structure (Key Files)
@@ -132,7 +127,6 @@ During development, several real-world issues were encountered and solved with c
 - `debug_language_ids.py` — Language ID debug tool
 - `check_database_schema.py` — Print DB schema
 - `dummy_problems.sql` — SQL for test problems
-- `.gitignore` — Ignore venv, pycache, etc.
 
 ---
 
