@@ -155,10 +155,10 @@ Here are some screenshots of the CodeZone platform in action:
 ![Dashboard](screenshots/codezone.png)
 
 ### Post Problem
-![Code Editor](screenshots/Post Problem.png)
+![Code Editor](screenshots/PostProblem.png)
 
 ### Your Snippets
 ![Problem List](screenshots/Snippets.png)
 
 ### View other's posts
-![Submission Result](screenshots/View posts.png)
+![Submission Result](screenshots/Viewposts.png)
