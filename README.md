@@ -152,15 +152,13 @@ During development, several real-world issues were encountered and solved with c
 Here are some screenshots of the CodeZone platform in action:
 
 ### Dashboard
-![Dashboard](screenshots/dashboard.png)
+![Dashboard](screenshots/codezone.png)
 
-### Code Editor
-![Code Editor](screenshots/editor.png)
+### Post Problem
+![Code Editor](screenshots/Post Problem.png)
 
-### Problem List
-![Problem List](screenshots/problems.png)
+### Your Snippets
+![Problem List](screenshots/Snippets.png)
 
-### Submission Result
-![Submission Result](screenshots/submission.png)
-
-<!-- Add more screenshots as needed -->
+### View other's posts
+![Submission Result](screenshots/View posts.png)
