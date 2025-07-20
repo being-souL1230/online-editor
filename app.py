@@ -3,7 +3,9 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import pymysql.cursors
 import requests
 import random
+import re
 from datetime import datetime, timedelta
+from code_executor import executor
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key_here'  # Replace with a secure key
@@ -19,10 +21,52 @@ def get_db_connection():
 
 JUDGE0_URL = "https://judge0-ce.p.rapidapi.com/submissions"
 API_HEADERS = {
-    "X-RapidAPI-Key": "36095c4209mshd3a281fb15d3fb6p113e5fjsn8898f20a7b1b",
+    "X-RapidAPI-Key": "960c512e30msh0b49d44a6f9c8e9p1d8d94jsn2d74820de492",
     "X-RapidAPI-Host": "judge0-ce.p.rapidapi.com",
     "Content-Type": "application/json"
 }
+
+def check_output_flexible(user_output: str, expected_output: str, checker_type: str = 'exact', custom_checker_code: str | None = None) -> bool:
+    """
+    Check if user output matches expected output based on checker type
+    """
+    if not user_output or not expected_output:
+        return False
+    
+    user_output = user_output.strip()
+    expected_output = expected_output.strip()
+    
+    if checker_type == 'exact':
+        return user_output == expected_output
+    
+    elif checker_type == 'ignore_whitespace':
+        # Remove all whitespace and compare
+        user_clean = re.sub(r'\s+', '', user_output)
+        expected_clean = re.sub(r'\s+', '', expected_output)
+        return user_clean == expected_clean
+    
+    elif checker_type == 'multiple_outputs':
+        # Expected output contains multiple valid outputs separated by '|'
+        valid_outputs = [out.strip() for out in expected_output.split('|')]
+        return user_output in valid_outputs
+    
+    elif checker_type == 'custom' and custom_checker_code:
+        try:
+            # Create a safe execution environment for custom checker
+            # This is a simplified version - in production, you'd want more security
+            local_vars = {
+                'user_output': user_output,
+                'expected_output': expected_output,
+                'result': False
+            }
+            exec(custom_checker_code, {}, local_vars)
+            return local_vars.get('result', False)
+        except Exception as e:
+            print(f"Custom checker error: {e}")
+            return False
+    
+    # Default to exact matching
+    return user_output == expected_output
 
 # Initialize database tables
 def init_db():
@@ -42,7 +86,7 @@ def init_db():
                     FOREIGN KEY (problem_id) REFERENCES problems(id)
                 )
             """)
-            # Ensure problems table has user_id
+            # Ensure problems table has user_id and new checker columns
             cursor.execute("""
                 CREATE TABLE IF NOT EXISTS problems (
                     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -52,6 +96,8 @@ def init_db():
                     difficulty ENUM('Easy', 'Medium', 'Hard'),
                     solution TEXT,
                     expected_output TEXT,
+                    checker_type ENUM('exact', 'ignore_whitespace', 'custom', 'multiple_outputs') DEFAULT 'exact',
+                    custom_checker_code TEXT NULL,
                     tags VARCHAR(255),
                     created_at DATETIME DEFAULT NOW(),
                     FOREIGN KEY (user_id) REFERENCES users(id)
@@ -161,7 +207,8 @@ def dashboard():
 
             # Calculate solved count
             cursor.execute("SELECT COUNT(DISTINCT problem_id) as solved_count FROM submissions WHERE user_id = %s AND status = 'Accepted'", (session['user_id'],))
-            solved_count = cursor.fetchone()['solved_count']
+            solved_result = cursor.fetchone()
+            solved_count = solved_result['solved_count'] if solved_result else 0
 
             # Calculate accuracy
             cursor.execute("""
@@ -237,16 +284,19 @@ def dashboard():
             # Add tried and accepted status to problems
             for prob in problems:
                 cursor.execute("SELECT COUNT(*) as tried FROM submissions WHERE user_id = %s AND problem_id = %s", (session['user_id'], prob['id']))
-                prob['tried'] = cursor.fetchone()['tried'] > 0
+                tried_result = cursor.fetchone()
+                prob['tried'] = tried_result['tried'] > 0 if tried_result else False
+                
                 cursor.execute("SELECT COUNT(*) as accepted FROM submissions WHERE user_id = %s AND problem_id = %s AND status = 'Accepted'", (session['user_id'], prob['id']))
-                prob['accepted'] = cursor.fetchone()['accepted'] > 0
+                accepted_result = cursor.fetchone()
+                prob['accepted'] = accepted_result['accepted'] > 0 if accepted_result else False
 
     finally:
         connection.close()
 
     return render_template("dashboard.html", 
                           name=session['user_name'], 
-                          email=user['email'], 
+                          email=user['email'] if user else '', 
                           problems=problems, 
                           snippets=snippets,
                           solved_count=solved_count, 
@@ -376,36 +426,55 @@ def run_code():
         finally:
             connection.close()
 
-    submission = {
-        "source_code": source_code,
-        "language_id": language_id,
-        "stdin": user_input
-    }
+    # Use our own code executor instead of Judge0
     try:
-        response = requests.post(f"{JUDGE0_URL}?base64_encoded=false&wait=true", headers=API_HEADERS, json=submission)
-        response.raise_for_status()
-        result = response.json()
-    except requests.RequestException as e:
-        return jsonify({"status": "Error", "output": f"Judge0 API error: {str(e)}"}), 500
-
-    status = result.get('status', {}).get('description', 'Unknown')
-    output = result.get('stdout', '') or result.get('stderr', 'No output produced')
+        # Convert language_id to int if it's a string
+        if isinstance(language_id, str):
+            language_id = int(language_id)
+        
+        result = executor.execute_code(source_code, language_id, user_input, timeout=10)
+        status = result.get('status', 'Unknown')
+        output = result.get('output', '') or result.get('error', 'No output produced')
+    except Exception as e:
+        return jsonify({"status": "Error", "output": f"Execution error: {str(e)}"}), 500
 
     if action == "submit":
         connection = get_db_connection()
         try:
             with connection.cursor() as cursor:
-                cursor.execute("SELECT expected_output FROM problems WHERE id = %s", (problem_id,))
+                # First, check if the new columns exist
+                try:
+                    cursor.execute("""
+                        SELECT expected_output, checker_type, custom_checker_code 
+                        FROM problems 
+                        WHERE id = %s
+                    """, (problem_id,))
+                    problem = cursor.fetchone()
+                    expected_output = problem['expected_output'] if problem else None
+                    checker_type = problem.get('checker_type', 'exact') if problem else 'exact'
+                    custom_checker_code = problem.get('custom_checker_code') if problem else None
+                except Exception as db_error:
+                    # If new columns don't exist, fall back to old query
+                    print(f"Database column error: {db_error}")
+                    cursor.execute("""
+                        SELECT expected_output 
+                        FROM problems 
+                        WHERE id = %s
+                    """, (problem_id,))
                 problem = cursor.fetchone()
                 expected_output = problem['expected_output'] if problem else None
+                    checker_type = 'exact'  # Default to exact matching
+                    custom_checker_code = None
 
                 cursor.execute("SELECT COUNT(*) as attempts FROM submissions WHERE user_id = %s AND problem_id = %s", (session['user_id'], problem_id))
-                attempt_count = cursor.fetchone()['attempts'] + 1
+                attempts_result = cursor.fetchone()
+                attempt_count = attempts_result['attempts'] + 1 if attempts_result else 1
 
-                if expected_output and output.strip() == expected_output.strip():
+                if expected_output and check_output_flexible(output, expected_output, checker_type, custom_checker_code):
                     status = "Accepted"
                     cursor.execute("SELECT COUNT(*) as solved FROM submissions WHERE user_id = %s AND problem_id = %s AND status = 'Accepted'", (session['user_id'], problem_id))
-                    already_solved = cursor.fetchone()['solved'] > 0
+                    solved_result = cursor.fetchone()
+                    already_solved = solved_result['solved'] > 0 if solved_result else False
                     
                     cursor.execute(
                         "INSERT INTO submissions (user_id, problem_id, status, time_spent, created_at) VALUES (%s, %s, %s, %s, NOW())",
@@ -512,13 +581,17 @@ def post_problem():
         difficulty = request.form.get('difficulty')
         solution = request.form.get('solution')
         expected_output = request.form.get('expected_output')
+        checker_type = request.form.get('checker_type', 'exact')
+        custom_checker_code = request.form.get('custom_checker_code')
         tags = request.form.get('tags')
         
         if not all([title, description, difficulty, expected_output]):
             return render_template('post_problem.html', error='All required fields must be filled.')
         if difficulty not in ['Easy', 'Medium', 'Hard']:
             return render_template('post_problem.html', error='Invalid difficulty.')
-        if len(title) > 255:
+        if checker_type not in ['exact', 'ignore_whitespace', 'custom', 'multiple_outputs']:
+            return render_template('post_problem.html', error='Invalid checker type.')
+        if title and len(title) > 255:
             return render_template('post_problem.html', error='Title too long.')
         if tags and len(tags) > 255:
             return render_template('post_problem.html', error='Tags too long.')
@@ -527,9 +600,9 @@ def post_problem():
         try:
             with connection.cursor() as cursor:
                 cursor.execute("""
-                    INSERT INTO users_problems (user_id, title, description, difficulty, solution, expected_output, tags)
-                    VALUES (%s, %s, %s, %s, %s, %s, %s)
-                """, (session['user_id'], title, description, difficulty, solution, expected_output, tags))
+                    INSERT INTO problems (user_id, title, description, difficulty, solution, expected_output, checker_type, custom_checker_code, tags)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+                """, (session['user_id'], title, description, difficulty, solution, expected_output, checker_type, custom_checker_code, tags))
                 connection.commit()
         except Exception as e:
             return render_template('post_problem.html', error=f"Database error: {str(e)}")
@@ -579,48 +652,75 @@ def submit_solution(problem_id):
         finally:
             connection.close()
 
-    # Judge0 evaluation
-    submission = {
-        "source_code": source_code,
-        "language_id": language_id,
-        "stdin": user_input
-    }
+    # Use our own code executor instead of Judge0
     try:
-        print(f"Sending submission to Judge0: {submission}")
-        response = requests.post(f"{JUDGE0_URL}?base64_encoded=false&wait=true", headers=API_HEADERS, json=submission)
-        response.raise_for_status()
-        result = response.json()
-        print(f"Judge0 response: {result}")
-    except requests.RequestException as e:
-        print(f"Judge0 API error: {str(e)}")
-        return jsonify({"status": "Error", "output": f"Judge0 API error: {str(e)}"}), 500
-    
-    output = result.get('stdout', '') or result.get('stderr', 'No output produced')
-    status = result.get('status', {}).get('description', 'Unknown')
+        # Convert language_id to int if it's a string
+        if isinstance(language_id, str):
+            language_id = int(language_id)
+        
+        print(f"Executing code with language_id: {language_id}")
+        result = executor.execute_code(source_code, language_id, user_input, timeout=10)
+        print(f"Execution result: {result}")
+        output = result.get('output', '') or result.get('error', 'No output produced')
+        status = result.get('status', 'Unknown')
+    except Exception as e:
+        print(f"Execution error: {str(e)}")
+        return jsonify({"status": "Error", "output": f"Execution error: {str(e)}"}), 500
     
     connection = get_db_connection()
     try:
         with connection.cursor() as cursor:
-            cursor.execute("SELECT expected_output FROM problems WHERE id = %s", (problem_id,))
+            # Get problem details including checker type
+            try:
+                cursor.execute("""
+                    SELECT expected_output, checker_type, custom_checker_code 
+                    FROM problems 
+                    WHERE id = %s
+                """, (problem_id,))
             problem = cursor.fetchone()
             if not problem:
                 print(f"Error: Problem ID {problem_id} not found")
                 return jsonify({'status': 'error', 'message': 'Problem not found'}), 404
+                
             expected_output = problem['expected_output']
+                checker_type = problem.get('checker_type', 'exact')
+                custom_checker_code = problem.get('custom_checker_code')
+            except Exception as db_error:
+                # If new columns don't exist, fall back to old query
+                print(f"Database column error in submit_solution: {db_error}")
+                cursor.execute("""
+                    SELECT expected_output 
+                    FROM problems 
+                    WHERE id = %s
+                """, (problem_id,))
+                problem = cursor.fetchone()
+                if not problem:
+                    print(f"Error: Problem ID {problem_id} not found")
+                    return jsonify({'status': 'error', 'message': 'Problem not found'}), 404
+                
+                expected_output = problem['expected_output']
+                checker_type = 'exact'  # Default to exact matching
+                custom_checker_code = None
 
             cursor.execute("SELECT COUNT(*) as attempts FROM submissions WHERE user_id = %s AND problem_id = %s", (session['user_id'], problem_id))
-            attempt_count = cursor.fetchone()['attempts'] + 1
+            attempts_result = cursor.fetchone()
+            attempt_count = attempts_result['attempts'] + 1 if attempts_result else 1
 
-            if output.strip() == expected_output.strip():
+            # Use flexible output checking
+            is_correct = check_output_flexible(output, expected_output, checker_type, custom_checker_code)
+            
+            if is_correct:
                 status = "Accepted"
                 cursor.execute("SELECT COUNT(*) as solved FROM submissions WHERE user_id = %s AND problem_id = %s AND status = 'Accepted'", (session['user_id'], problem_id))
-                already_solved = cursor.fetchone()['solved'] > 0
+                solved_result = cursor.fetchone()
+                already_solved = solved_result['solved'] > 0 if solved_result else False
                 
                 cursor.execute(
                     "INSERT INTO submissions (user_id, problem_id, status, time_spent, created_at) VALUES (%s, %s, %s, %s, NOW())",
                     (session['user_id'], problem_id, status, time_spent)
                 )
                 
+                # Only save snippet and update leaderboard if this is the first time solving
                 if not already_solved:
                     print(f"Saving snippet for user_id: {session['user_id']}, problem_id: {problem_id}")
                     cursor.execute("""
@@ -672,10 +772,12 @@ def post_feedback(problem_id):
             connection.commit()
             
             cursor.execute('SELECT LAST_INSERT_ID() AS id')
-            feedback_id = cursor.fetchone()['id']
+            feedback_result = cursor.fetchone()
+            feedback_id = feedback_result['id'] if feedback_result else None
             
             cursor.execute('SELECT name FROM users WHERE id = %s', (session['user_id'],))
-            user_name = cursor.fetchone()['name']
+            user_result = cursor.fetchone()
+            user_name = user_result['name'] if user_result else 'Unknown'
     
     except Exception as e:
         return jsonify({'status': 'error', 'message': f"Database error: {str(e)}"}), 500
@@ -706,7 +808,7 @@ def user_problems(user_id):
             if not user:
                 return "User not found", 404
             
-            # Fetch user’s posted problems
+            # Fetch user's posted problems
             cursor.execute("SELECT id, title, difficulty, tags, created_at FROM users_problems WHERE user_id = %s", (user_id,))
             problems = cursor.fetchall()
             

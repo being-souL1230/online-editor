@@ -455,6 +455,31 @@
             </div>
 
             <div class="form-group">
+                <label for="checker_type" class="required"><i class="fas fa-cogs"></i> Output Checker Type</label>
+                <select id="checker_type" name="checker_type" required>
+                    <option value="exact" selected>Exact Match</option>
+                    <option value="ignore_whitespace">Ignore Whitespace</option>
+                    <option value="multiple_outputs">Multiple Valid Outputs</option>
+                    <option value="custom">Custom Checker</option>
+                </select>
+                <div class="tag-helper">Choose how to validate the user's output</div>
+            </div>
+
+            <div class="form-group" id="custom_checker_group" style="display: none;">
+                <label for="custom_checker_code"><i class="fas fa-code"></i> Custom Checker Code</label>
+                <textarea id="custom_checker_code" name="custom_checker_code" placeholder="Write Python code to validate output. Use 'user_output' and 'expected_output' variables. Set 'result = True/False'."></textarea>
+                <div class="tag-helper">Write Python code that sets 'result = True' if output is correct, 'result = False' otherwise</div>
+                <div class="char-count" id="checker-count">0/2000</div>
+            </div>
+
+            <div class="form-group" id="multiple_outputs_help" style="display: none;">
+                <div class="tag-helper" style="background: rgba(6, 182, 212, 0.1); padding: 10px; border-radius: 8px; border: 1px solid rgba(6, 182, 212, 0.2);">
+                    <strong>Multiple Outputs Format:</strong> Separate valid outputs with '|' character.<br>
+                    Example: <code>1 2 3 4 5|1,2,3,4,5|[1,2,3,4,5]</code> will accept any of these three formats.
+                </div>
+            </div>
+
+            <div class="form-group">
                 <label for="tags"><i class="fas fa-tags"></i> Tags (Optional)</label>
                 <input type="text" id="tags" name="tags" placeholder="e.g., Array, Math, Algorithm">
                 <div class="tag-helper">Separate tags with commas (max 5 tags)</div>
@@ -529,6 +554,28 @@
             }
         });
 
+        // Checker type functionality
+        const checkerType = document.getElementById('checker_type');
+        const customCheckerGroup = document.getElementById('custom_checker_group');
+        const multipleOutputsHelp = document.getElementById('multiple_outputs_help');
+        const customCheckerCode = document.getElementById('custom_checker_code');
+        const checkerCount = document.getElementById('checker-count');
+        
+        checkerType.addEventListener('change', () => {
+            const selectedType = checkerType.value;
+            
+            // Hide all optional groups
+            customCheckerGroup.style.display = 'none';
+            multipleOutputsHelp.style.display = 'none';
+            
+            // Show relevant group based on selection
+            if (selectedType === 'custom') {
+                customCheckerGroup.style.display = 'block';
+            } else if (selectedType === 'multiple_outputs') {
+                multipleOutputsHelp.style.display = 'block';
+            }
+        });
+
         // Character counters
         const description = document.getElementById('description');
         const solution = document.getElementById('solution');
@@ -537,13 +584,26 @@
         
         description.addEventListener('input', updateCharCount);
         solution.addEventListener('input', updateCharCount);
+        customCheckerCode.addEventListener('input', updateCharCount);
         
         function updateCharCount(e) {
             const target = e ? e.target : description;
-            const counter = target === description ? descCount : solutionCount;
-            const maxLength = target === description ? 2000 : 5000;
-            const length = target.value.length;
+            let counter, maxLength;
             
+            if (target === description) {
+                counter = descCount;
+                maxLength = 2000;
+            } else if (target === solution) {
+                counter = solutionCount;
+                maxLength = 5000;
+            } else if (target === customCheckerCode) {
+                counter = checkerCount;
+                maxLength = 2000;
+            } else {
+                return;
+            }
+            
+            const length = target.value.length;
             counter.textContent = `${length}/${maxLength}`;
             
             if (length > maxLength * 0.9) {
@@ -558,6 +618,7 @@
         // Initialize counters
         updateCharCount({ target: description });
         updateCharCount({ target: solution });
+        updateCharCount({ target: customCheckerCode });
 
         // Navbar scroll effect
         window.addEventListener('scroll', () => {

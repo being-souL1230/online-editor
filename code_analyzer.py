@@ -1,14 +1,21 @@
 from bs4 import BeautifulSoup
+from bs4.element import Tag
 from difflib import SequenceMatcher
 import os
 
 def smart_merge(old_code: str, updated_snippet: str):
-    old_soup = BeautifulSoup(old_code, 'html.parser')
-    update_soup = BeautifulSoup(updated_snippet, 'html.parser')
+    try:
+        old_soup = BeautifulSoup(old_code, 'html.parser')
+        update_soup = BeautifulSoup(updated_snippet, 'html.parser')
+    except Exception as e:
+        print(f"Error parsing HTML: {e}")
+        return old_code, 0
 
     changes = 0
     for new_tag in update_soup.find_all():
-        matching_old_tags = old_soup.find_all(new_tag.name)
+        if not isinstance(new_tag, Tag):
+            continue
+        matching_old_tags = [t for t in old_soup.find_all() if isinstance(t, Tag) and t.name == new_tag.name]
 
         best_match = None
         highest_ratio = 0
@@ -36,7 +43,10 @@ def read_multiline_input(prompt):
     print("(Paste code below. Press Enter on a blank line to finish.)")
     lines = []
     while True:
-        line = input()
+        try:
+            line = input()
+        except EOFError:
+            break
         if line.strip() == "":
             break
         lines.append(line)
@@ -65,13 +75,20 @@ def main():
         print("\n❌ Invalid choice. Exiting.")
         return
 
+    if not old_code.strip() or not updated_code.strip():
+        print("\n❌ One or both code inputs are empty. Exiting.")
+        return
+
     merged_code, changes = smart_merge(old_code, updated_code)
 
     if choice == "1":
-        with open("merged_output.html", "w", encoding="utf-8") as f3:
-            f3.write(merged_code)
-        print(f"\n[✓] Merge complete. {changes} changes applied.")
-        print("[✓] Output saved to 'merged_output.html'")
+        try:
+            with open("merged_output.html", "w", encoding="utf-8") as f3:
+                f3.write(merged_code)
+            print(f"\n[✓] Merge complete. {changes} changes applied.")
+            print("[✓] Output saved to 'merged_output.html'")
+        except Exception as e:
+            print(f"\n❌ Error writing output file: {e}")
     else:
         print("\n==== Merged Code Output ====")
         print(merged_code)
