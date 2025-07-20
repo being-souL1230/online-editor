@@ -116,7 +116,7 @@ During development, several real-world issues were encountered and solved with c
 
 ---
 
-## 📦 Project Structure (Key Files)
+## Project Structure (Key Files)
 - `app.py` — Main Flask app
 - `code_executor.py` — Local code execution engine
 - `insert_dummy_problems.py` — Insert test problems
@@ -130,7 +130,7 @@ During development, several real-world issues were encountered and solved with c
 
 ---
 
-## 📝 What to Do If You Face Issues
+## What to Do If You Face Issues
 - **Database errors:** Run `migrate_database.py` or `fix_database_constraints.py`.
 - **Schema mismatch:** Use `check_database_schema.py` to debug.
 - **Dummy data needed:** Run `insert_dummy_problems.py`.
