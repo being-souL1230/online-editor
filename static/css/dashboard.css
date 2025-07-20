@@ -371,7 +371,6 @@ body {
 .status-attempted {
     color: #f59e0b;
 }
-
 @keyframes tick-pop {
     0% { transform: scale(1); }
     100% { transform: scale(1.18); }
