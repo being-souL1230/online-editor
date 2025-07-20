@@ -19,6 +19,19 @@ A full-featured LeetCode-style web application built using Flask, MySQL, HTML/CS
 
 ---
 
+## 📸 Screenshots
+
+### Dashboard
+![Dashboard](screenshots/dashboard.png)
+
+### Problem Posting
+![Problem Posting](screenshots/problem_post.png)
+
+### Code Execution
+![Code Execution](screenshots/code_execution.png)
+
+---
+
 ##  Tech Stack
 
 - Flask (Python backend)
@@ -140,3 +153,4 @@ During development, several real-world issues were encountered and solved with c
 - **Unwanted files in git:** Update `.gitignore` and run `git rm --cached <file>`.
 
 ---
+
