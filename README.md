@@ -1,25 +1,25 @@
-# 💻 Online Code Editor & Practice Platform
+#  Online Code Editor & Practice Platform
 
 A full-featured LeetCode-style web application built using Flask, MySQL, HTML/CSS/JS, and a secure local code execution engine (Python, C, C++). Users can solve problems, submit code, track streaks, accuracy, and even view other user's challenges and feedback. Flexible output checkers and admin scripts make it easy to manage and extend.
 
 ---
 
-## 🚀 Features
+##  Features
 
-- 🧠 User Auth (signup/login)
-- 📝 Code editor with syntax highlighting
-- 🧪 Problem submission and solving with flexible validation (exact, ignore whitespace, multiple outputs, custom checker)
-- ⏱️ Timer system with pause/resume
-- 📊 Leaderboard with score, accuracy, rank
-- 💬 Feedback/comment system on problems
-- 🧾 View personal code snippets
-- 🔍 Filter by tags/difficulty
-- ⚡ Local server-side code execution (Python, C, C++)
-- 🛠️ Admin/utility scripts for database and debugging
+-  User Auth (signup/login)
+-  Code editor with syntax highlighting
+-  Problem submission and solving with flexible validation (exact, ignore whitespace, multiple outputs, custom checker)
+-  Timer system with pause/resume
+-  Leaderboard with score, accuracy, rank
+-  Feedback/comment system on problems
+-  View personal code snippets
+-  Filter by tags/difficulty
+-  Local server-side code execution (Python, C, C++)
+- 🛠 Admin/utility scripts for database and debugging
 
 ---
 
-## 🧰 Tech Stack
+##  Tech Stack
 
 - Flask (Python backend)
 - MySQL (data storage)
@@ -30,7 +30,7 @@ A full-featured LeetCode-style web application built using Flask, MySQL, HTML/CS
 
 ---
 
-## ⚙️ Installation Guide
+##  Installation Guide
 
 ### 1. Clone the Repository
 
@@ -75,7 +75,7 @@ python app.py
 
 ---
 
-## 🛠️ Problems & Solutions During Development
+## Problems & Solutions During Development
 
 During development, several real-world issues were encountered and solved with custom scripts and code improvements. Here are the main problems and how they were addressed:
 
