@@ -6,6 +6,8 @@ import random
 import re
 from datetime import datetime, timedelta
 from code_executor import executor
+import markdown as md
+from markupsafe import Markup
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key_here'  # Replace with a secure key
@@ -204,6 +206,12 @@ def dashboard():
             # Fetch all users except current user
             cursor.execute("SELECT id, name FROM users WHERE id != %s ORDER BY name ASC", (session['user_id'],))
             users = cursor.fetchall()
+
+            # For each user, check if they have posted any problems
+            for u in users:
+                cursor.execute("SELECT COUNT(*) as post_count FROM users_problems WHERE user_id = %s", (u['id'],))
+                post_result = cursor.fetchone()
+                u['has_posted'] = post_result['post_count'] > 0 if post_result else False
 
             # Calculate solved count
             cursor.execute("SELECT COUNT(DISTINCT problem_id) as solved_count FROM submissions WHERE user_id = %s AND status = 'Accepted'", (session['user_id'],))
@@ -765,7 +773,7 @@ def post_feedback(problem_id):
     try:
         with connection.cursor() as cursor:
             cursor.execute("""
-                INSERT INTO feedback (user_id, problem_id, feedback)
+                INSERT INTO feedback (user_id, users_problem_id, feedback)
                 VALUES (%s, %s, %s)
             """, (session['user_id'], problem_id, feedback_text.strip()))
             connection.commit()
@@ -827,6 +835,24 @@ def user_problems(user_id):
     
     return render_template('users_problem.html', user=user, problems=problems)
 
+@app.route("/user_problem_solve/<int:problem_id>", methods=["GET"])
+def user_problem_solve(problem_id):
+    if 'user_id' not in session:
+        return redirect(url_for("login"))
+
+    connection = get_db_connection()
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT * FROM users_problems WHERE id = %s", (problem_id,))
+            problem = cursor.fetchone()
+    finally:
+        connection.close()
+
+    if problem:
+        return render_template("user_problem_solve.html", problem=problem)
+    else:
+        return "User Problem not found", 404
+
 @app.template_filter('icon_class')
 def icon_class(language):
     icons = {
@@ -843,10 +869,145 @@ def icon_class(language):
     }
     return icons.get(language.lower(), 'fas fa-code')
 
+@app.template_filter('markdown')
+def markdown_filter(text):
+    if not text:
+        return ""
+    return Markup(md.markdown(text, extensions=['fenced_code', 'tables']))
+
+@app.template_filter('datetimeformat')
+def datetimeformat(value, format='%d %b %Y, %I:%M %p'):
+    if isinstance(value, str):
+        try:
+            value = datetime.strptime(value, '%Y-%m-%d %H:%M:%S')
+        except Exception:
+            return value
+    return value.strftime(format)
+
 @app.route("/logout")
 def logout():
     session.clear()
     return redirect(url_for("login"))
+
+@app.route('/run_user_problem', methods=['POST'])
+def run_user_problem():
+    if 'user_id' not in session:
+        return jsonify({'status': 'error', 'message': 'Please login'}), 401
+    data = request.get_json()
+    source_code = data.get('code')
+    language_id = data.get('language')
+    user_input = data.get('stdin', '')
+    problem_id = data.get('problem_id')
+    if not all([source_code, language_id, problem_id]) or not source_code.strip():
+        return jsonify({'status': 'Error', 'output': 'Code cannot be empty'}), 400
+    # Fetch expected_output from users_problems
+    connection = get_db_connection()
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute('SELECT expected_output FROM users_problems WHERE id = %s', (problem_id,))
+            problem = cursor.fetchone()
+            expected_output = problem['expected_output'] if problem else None
+    finally:
+        connection.close()
+    # Use the same executor as main problems
+    try:
+        if isinstance(language_id, str):
+            language_id = int(language_id)
+        result = executor.execute_code(source_code, language_id, user_input, timeout=10)
+        output = result.get('output', '') or result.get('error', 'No output produced')
+    except Exception as e:
+        return jsonify({'status': 'Error', 'output': f'Execution error: {str(e)}'}), 500
+    # Check output (exact match)
+    if expected_output is not None and output.strip() == expected_output.strip():
+        status = 'Correct'
+    else:
+        status = 'Output'
+    return jsonify({'status': status, 'output': output})
+
+@app.route('/get_user_problem_feedback/<int:problem_id>')
+def get_user_problem_feedback(problem_id):
+    connection = get_db_connection()
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute('''
+                SELECT f.id, f.user_id, f.feedback, f.created_at, u.name AS user_name
+                FROM feedback f
+                JOIN users u ON f.user_id = u.id
+                WHERE f.users_problem_id = %s
+                ORDER BY f.created_at DESC
+            ''', (problem_id,))
+            feedback = cursor.fetchall()
+    finally:
+        connection.close()
+    return jsonify({'feedback': feedback})
+
+@app.route('/post_user_problem_feedback/<int:problem_id>', methods=['POST'])
+def post_user_problem_feedback(problem_id):
+    if 'user_id' not in session:
+        return jsonify({'status': 'error', 'message': 'Please login'}), 401
+    feedback_text = request.form.get('feedback')
+    if not feedback_text or len(feedback_text.strip()) == 0:
+        return jsonify({'status': 'error', 'message': 'Feedback cannot be empty'}), 400
+    connection = get_db_connection()
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute('''
+                INSERT INTO feedback (user_id, users_problem_id, feedback)
+                VALUES (%s, %s, %s)
+            ''', (session['user_id'], problem_id, feedback_text.strip()))
+            connection.commit()
+            cursor.execute('SELECT LAST_INSERT_ID() AS id')
+            feedback_result = cursor.fetchone()
+            feedback_id = feedback_result['id'] if feedback_result else None
+            cursor.execute('SELECT name FROM users WHERE id = %s', (session['user_id'],))
+            user_result = cursor.fetchone()
+            user_name = user_result['name'] if user_result else 'Unknown'
+    except Exception as e:
+        return jsonify({'status': 'error', 'message': f"Database error: {str(e)}"}), 500
+    finally:
+        connection.close()
+    return jsonify({
+        'status': 'success',
+        'feedback': {
+            'id': feedback_id,
+            'user_name': user_name,
+            'feedback': feedback_text.strip(),
+            'created_at': 'Just now'
+        }
+    })
+
+@app.route("/post_user_problem", methods=["GET", "POST"])
+def post_user_problem():
+    if 'user_id' not in session:
+        return redirect(url_for("login"))
+
+    if request.method == "POST":
+        title = request.form.get('title')
+        description = request.form.get('description')
+        difficulty = request.form.get('difficulty')
+        solution = request.form.get('solution')
+        expected_output = request.form.get('expected_output')
+        tags = request.form.get('tags')
+
+        if not all([title, description, difficulty, expected_output]):
+            return render_template('post_problem.html', error='All required fields must be filled.')
+
+        connection = get_db_connection()
+        try:
+            with connection.cursor() as cursor:
+                cursor.execute("""
+                    INSERT INTO users_problems (user_id, title, description, difficulty, solution, expected_output, tags, created_at, problem_solved)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, NOW(), 0)
+                """, (session['user_id'], title, description, difficulty, solution, expected_output, tags))
+                connection.commit()
+        except Exception as e:
+            return render_template('post_problem.html', error=f"Database error: {str(e)}")
+        finally:
+            connection.close()
+
+        return redirect(url_for('dashboard'))
+
+    return render_template('post_problem.html')
 
 if __name__ == "__main__":
     init_db()
