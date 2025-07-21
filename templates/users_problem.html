@@ -58,7 +58,7 @@
         /* === Navbar === */
         .navbar {
             background: rgba(10, 14, 26, 0.85);
-            padding: 15px 40px;
+            padding: 8px 18px;
             position: fixed;
             top: 0;
             width: 100%;
@@ -66,9 +66,13 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-            backdrop-filter: blur(15px);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.18);
+            backdrop-filter: blur(10px);
             border-bottom: 1px solid var(--border);
+            transition: top 0.35s cubic-bezier(0.4,0,0.2,1);
+        }
+        .navbar.hide-on-scroll {
+            top: -70px;
         }
 
         .navbar h2 {
@@ -244,12 +248,12 @@
         /* === Container === */
         .container {
             max-width: 1100px;
-            margin: 100px auto 40px;
-            padding: 30px;
+            margin: 25px auto 20px;
+            padding: 16px 8px;
             background: var(--bg-container);
-            border-radius: 20px;
-            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.4);
-            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.18);
+            backdrop-filter: blur(8px);
             border: 1px solid var(--border);
         }
 
@@ -276,20 +280,20 @@
         .problem-grid {
             display: grid;
             grid-template-columns: 1fr;
-            gap: 20px; /* Reduced from 25px */
+            gap: 12px;
         }
 
         .problem-card {
             background: var(--bg-card);
-            border-radius: 14px; /* Slightly smaller */
-            padding: 20px; /* Reduced from 30px */
+            border-radius: 12px;
+            padding: 14px 12px;
             display: flex;
             flex-direction: column;
-            gap: 15px; /* Reduced from 20px */
-            border: 2px solid var(--border);
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            gap: 10px;
+            border: 1.5px solid var(--border);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.13);
             animation: fadeIn 0.5s ease-out;
         }
 
@@ -638,9 +642,13 @@
         /* === Responsive Design === */
         @media (max-width: 768px) {
             .navbar {
-                padding: 15px 20px;
+                position: static;
+                width: 100%;
+                padding: 3px 2px;
+                min-height: 36px;
                 flex-direction: column;
-                gap: 15px;
+                gap: 4px;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.10);
             }
 
             .navbar-nav {
@@ -650,63 +658,61 @@
             }
 
             .container {
-                margin: 90px 20px 30px;
-                padding: 20px;
+                margin: 10px 2px 8px 2px;
+                padding: 6px 2px;
             }
 
             .problem-card {
-                padding: 15px; /* Further reduced for mobile */
+                padding: 10px 6px;
             }
 
             .problem-card-header {
                 flex-direction: column;
                 align-items: flex-start;
-                gap: 8px;
+                gap: 6px;
             }
 
             .problem-meta {
                 flex-direction: column;
                 align-items: flex-start;
-                gap: 8px;
+                gap: 6px;
             }
         }
 
         @media (max-width: 480px) {
+            .navbar {
+                padding: 1.5px 1px;
+                min-height: 28px;
+                gap: 2px;
+            }
             h1 {
-                font-size: 1.8rem;
+                font-size: 1.3rem;
             }
-
             .problem-title {
-                font-size: 1.1rem;
+                font-size: 1rem;
             }
-
             .action-btn {
-                padding: 7px 15px;
-                font-size: 0.9rem;
+                padding: 5px 10px;
+                font-size: 0.85rem;
             }
-
             .feedback-form button {
                 width: 100%;
                 align-self: stretch;
             }
-
             .problem-id, .problem-difficulty, .tag {
-                font-size: 0.75rem;
-                padding: 5px 8px;
+                font-size: 0.7rem;
+                padding: 4px 6px;
             }
-
             .theme-toggle-label {
-                width: 40px;
-                height: 20px;
-            }
-
-            .theme-toggle-label::after {
-                width: 16px;
+                width: 32px;
                 height: 16px;
             }
-
+            .theme-toggle-label::after {
+                width: 12px;
+                height: 12px;
+            }
             .theme-toggle input:checked + .theme-toggle-label::after {
-                transform: translateX(20px);
+                transform: translateX(14px);
             }
         }
 
@@ -752,30 +758,13 @@ body {
     100% { background-position: 1000px 0; }
 }
 
+        .hamburger-menu-container, .hamburger-icon, .dropdown-overlay, .dropdown-menu, .dropdown-header {
+            display: none !important;
+        }
+
     </style>
 </head>
 <body>
-    <!-- Navbar -->
-    <div class="navbar">
-        <h2>CodeZone 🚀</h2>
-        <div class="navbar-nav">
-            <a href="/dashboard">Home</a>
-            <a href="/problems">Problems</a>
-            <a href="/post_problem">Post Problem</a>
-            <div class="theme-toggle">
-                <input type="checkbox" id="theme-toggle" aria-label="Toggle Theme">
-                <label for="theme-toggle" class="theme-toggle-label"></label>
-            </div>
-            <div class="dropdown">
-                <span class="dropdown-toggle">👋 {{ session.user_name }}</span>
-                <div class="dropdown-menu">
-                    <a href="/edit-profile"><i class="fas fa-user-edit"></i> Edit Profile</a>
-                    <a href="/logout" style="color: #ef4444;"><i class="fas fa-sign-out-alt"></i> Logout</a>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <!-- Main Content -->
     <div class="container">
         <h1><i class="fas fa-user"></i> {{ user.name }}'s Problems</h1>
@@ -791,16 +780,17 @@ body {
             {% for problem in problems %}
             <div class="problem-card">
                 <div class="problem-card-header">
-                    <div class="problem-id">#{{ problem.id }}</div>
+                    <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                        <div class="problem-id">#{{ problem.id }}</div>
+                        <h4 class="problem-title" style="margin: 0; font-size: 1.1rem; display: flex; align-items: center; gap: 6px;">
+                            <i class="fas fa-puzzle-piece"></i>
+                            {{ problem.title }}
+                        </h4>
+                    </div>
                     <div class="problem-difficulty difficulty-{{ problem.difficulty|lower }}">
                         {{ problem.difficulty }}
                     </div>
                 </div>
-        
-                <h4 class="problem-title">
-                    <i class="fas fa-puzzle-piece"></i>
-                    {{ problem.title }}
-                </h4>
         
                 {% if problem.tags %}
                 <div class="problem-tags">
@@ -812,7 +802,7 @@ body {
         
                 <div class="problem-meta">
                     <span><i class="fas fa-clock"></i> Posted: {{ problem.created_at }}</span>
-                    <a href="/problems/{{ problem.id }}" class="action-btn">
+                    <a href="/user_problem_solve/{{ problem.id }}" class="action-btn">
                         <i class="fas fa-play"></i> Solve
                     </a>
                 </div>
@@ -874,18 +864,7 @@ body {
             });
 
             // Dropdown Toggle
-            const dropdownToggle = document.querySelector('.dropdown-toggle');
-            const dropdownMenu = document.querySelector('.dropdown-menu');
-
-            dropdownToggle.addEventListener('click', () => {
-                dropdownMenu.classList.toggle('active');
-            });
-
-            document.addEventListener('click', (e) => {
-                if (!dropdownToggle.contains(e.target) && !dropdownMenu.contains(e.target)) {
-                    dropdownMenu.classList.remove('active');
-                }
-            });
+            // Removed dropdown toggle JS
 
             // Feedback Form Submission
             document.querySelectorAll('.feedback-form').forEach(form => {
@@ -949,6 +928,22 @@ body {
         document.getElementById('real-problems').style.display = 'grid';
     }, 1000);
 });
+
+        // Hide navbar on scroll down, show on scroll up
+        let lastScrollY = window.scrollY;
+        const navbar = document.querySelector('.navbar');
+        window.addEventListener('scroll', function() {
+            if (!navbar) return;
+            if (window.scrollY > lastScrollY && window.scrollY > 30) {
+                navbar.classList.add('hide-on-scroll');
+            } else {
+                navbar.classList.remove('hide-on-scroll');
+            }
+            lastScrollY = window.scrollY;
+        });
+
+        // Hamburger menu toggle with overlay
+        // Removed hamburger menu JS
     </script>
 </body>
 </html>
