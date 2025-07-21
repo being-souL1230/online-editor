@@ -9,33 +9,38 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
 </head>
 <body>
-    <!-- Navbar -->
-    <div class="navbar">
-        <h2>CodeZone 🚀</h2>
-        <div>
-            <a href="/dashboard">Home</a>
-            <a href="/problems">Problems</a>
-            <a href="/post_problem" class=""> Post Problem </a>
-            <a href="/view_snippets" class=""><i class="fas fa-code"></i>Snippets</a>
-            <a href="/logout" style="color: #ef4444;"><i class="fas fa-sign-out-alt"></i> Logout</a>
-                </div>
+    <div class="dashboard-header">
+        <div class="hamburger-menu-container">
+            <div class="hamburger-icon" id="hamburger-icon">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+            <div class="dropdown-menu" id="dropdown-menu">
+                <div class="dropdown-header">CodeZone 🚀</div>
+                <a href="/dashboard"><i class="fas fa-home"></i> Home</a>
+                <a href="/problems"><i class="fas fa-list"></i> Problems</a>
+                <a href="/post_problem"><i class="fas fa-plus-circle"></i> Post Problem</a>
+                <a href="/view_snippets"><i class="fas fa-code"></i> Snippets</a>
+                <a href="/logout" style="color: #ef4444;"><i class="fas fa-sign-out-alt"></i> Logout</a>
             </div>
         </div>
+        <h1 class="dashboard-title">CodeZone Dashboard</h1>
     </div>
 
     <!-- Main Content -->
     <div class="container">
         <!-- Problems List Section -->
         <div class="problem-list">
-            <h3 class="problem-list-title">�� Problem List</h3>
+            <h3 class="problem-list-title"> Problem List</h3>
             <!-- Filters -->
             <div class="filters">
                 <input type="text" id="search" placeholder="Search problems...">
                 <select id="difficulty">
                     <option value="">All Difficulties</option>
-                    <option value="Easy">Easy</option>
-                    <option value="Medium">Medium</option>
-                    <option value="Hard">Hard</option>
+                    <option value="easy">Easy</option>
+                    <option value="medium">Medium</option>
+                    <option value="hard">Hard</option>
                 </select>
                 <select id="tag">
                     <option value="">All Tags</option>
@@ -145,7 +150,7 @@
                     <div>
                         <div><strong>Problem #{{ sub.problem_id }}</strong></div>
                         <div style="font-size: 0.8rem; color: #94a3b8;">
-                            {{ sub.created_at }}
+                            {{ sub.created_at | datetimeformat }}
                         </div>
                     </div>
                     <div class="submission-status status-{{ sub.status|lower }}">
@@ -154,6 +159,8 @@
                     <div class="submission-time">
                         {% if sub.time_spent %}
                             {{ (sub.time_spent // 60)|int }}m {{ (sub.time_spent % 60)|int }}s
+                        {% elif sub.status == 'started' %}
+                            In Progress
                         {% else %}
                             --
                         {% endif %}
@@ -201,9 +208,11 @@
                         <div><strong>{{ user.name }}</strong></div>
                         <div style="font-size: 0.8rem; color: #94a3b8;">View posted problems</div>
                     </div>
-                    <a href="/user_problems/{{ user.id }}" class="action-btn solve-btn">
-                        <i class="fas fa-eye"></i> View Posts
-                    </a>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <a href="/user_problems/{{ user.id }}" class="action-btn solve-btn">
+                            <span class="post-status-dot {% if user.has_posted %}dot-green{% else %}dot-red{% endif %}"></span> Posts
+                        </a>
+                    </div>
                 </div>
                 {% endfor %}
             </div>
@@ -235,7 +244,7 @@
             }
             
             const search = searchInput.value.toLowerCase().trim();
-            const difficulty = difficultySelect.value.toLowerCase();
+            const difficulty = difficultySelect.value; // Already lowercase from HTML, no need to call toLowerCase()
             const tag = tagSelect.value.toLowerCase();
             
             console.log('Filtering with:', { search, difficulty, tag });
@@ -252,7 +261,7 @@
                 
                 // Get text content and clean it up
                 const title = titleElement.textContent.trim().toLowerCase();
-                const cardDifficulty = card.querySelector('.problem-difficulty').textContent.toLowerCase();
+                const cardDifficulty = card.querySelector('.problem-difficulty').textContent.toLowerCase().trim();
                 const cardTags = Array.from(card.querySelectorAll('.tag')).map(tag => tag.textContent.toLowerCase());
                 
                 const matchesSearch = search === '' || title.includes(search);
@@ -320,6 +329,274 @@
                     }
                 });
             });
+        });
+    </script>
+    <style>
+        .dashboard-header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 18px;
+            margin: 0 0 18px 0;
+            padding-top: 18px;
+            position: relative;
+        }
+        .dashboard-title {
+            font-size: 2.1rem;
+            font-weight: 800;
+            color: #06b6d4;
+            letter-spacing: 1px;
+            margin: 0 auto;
+            flex-shrink: 0;
+            text-align: center;
+        }
+        .hamburger-menu-container {
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            margin-left: 0;
+            z-index: 2200;
+        }
+        .hamburger-icon {
+            width: 44px;
+            height: 44px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            background: rgba(10,14,26,0.92);
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.10);
+            border: 1px solid #1e293b;
+            transition: background 0.2s;
+            z-index: 2300;
+        }
+        .hamburger-icon span {
+            display: block;
+            width: 26px;
+            height: 3px;
+            background: #d8dee9;
+            margin: 4px 0;
+            border-radius: 2px;
+            transition: all 0.3s;
+        }
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            top: 48px;
+            left: 0;
+            min-width: 180px;
+            max-width: 90vw;
+            background: rgba(20, 25, 40, 0.98);
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.28);
+            border: 1px solid #1e293b;
+            flex-direction: column;
+            padding: 10px 0;
+            z-index: 2100;
+            animation: fadeIn 0.2s;
+            transition: left 0.2s, top 0.2s;
+            overflow: hidden;
+        }
+        .dropdown-menu.active {
+            display: flex;
+        }
+        .dropdown-header {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #06b6d4;
+            padding: 8px 18px 10px 18px;
+            border-bottom: 1px solid #1e293b;
+            margin-bottom: 6px;
+        }
+        .dropdown-menu a {
+            color: #d8dee9;
+            text-decoration: none;
+            font-size: 1.08rem;
+            padding: 14px 22px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: background 0.2s, color 0.2s;
+            border-bottom: 1px solid #1e293b;
+        }
+        .dropdown-menu a:hover {
+            background: #1e293b;
+            color: #22d3ee;
+            border-radius: 0;
+        }
+        .dropdown-menu a:last-child {
+            border-bottom: none;
+        }
+        @media (max-width: 768px) {
+            .dashboard-header {
+                flex-direction: row;
+                align-items: center;
+                justify-content: center;
+                gap: 10px;
+                padding-left: 0;
+            }
+            .dashboard-title {
+                font-size: 1.3rem;
+            }
+            .hamburger-menu-container {
+                position: absolute;
+                left: 0;
+                top: 50%;
+                transform: translateY(-50%);
+            }
+            .hamburger-icon {
+                width: 38px;
+                height: 38px;
+            }
+            .hamburger-icon span {
+                width: 18px;
+                height: 3px;
+                margin: 3px 0;
+            }
+            .dropdown-menu {
+                top: 40px;
+                left: 0;
+                min-width: 140px;
+                max-width: 98vw;
+            }
+            .dropdown-menu a {
+                font-size: 1.01rem;
+                padding: 11px 10px;
+            }
+        }
+        .container {
+            margin-top: 18px !important;
+        }
+        @media (max-width: 768px) {
+            .container {
+                margin-top: 10px !important;
+            }
+        }
+        .post-status-dot {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 2px;
+            box-shadow: 0 0 6px 2px rgba(0,0,0,0.12);
+        }
+        .dot-green {
+            background: #22c55e;
+            box-shadow: 0 0 8px 2px #22c55e88, 0 0 2px #22c55e;
+        }
+        .dot-red {
+            background: #ef4444;
+            box-shadow: 0 0 8px 2px #ef444488, 0 0 2px #ef4444;
+        }
+        .action-btn.solve-btn {
+            background: linear-gradient(90deg, rgba(30,41,59,0.65) 0%, rgba(15,23,42,0.55) 100%);
+            color: #e0f2fe;
+            border: 1.5px solid rgba(51,65,85,0.35);
+            border-radius: 22px;
+            padding: 7px 22px 7px 16px;
+            font-weight: 600;
+            font-size: 1.01rem;
+            box-shadow: 0 2px 16px 0 rgba(16,185,255,0.10), 0 1.5px 8px 0 rgba(30,41,59,0.10);
+            transition: background 0.35s cubic-bezier(.4,0,.2,1), box-shadow 0.25s, border 0.25s, color 0.25s, transform 0.18s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            outline: none;
+            cursor: pointer;
+            backdrop-filter: blur(8px) saturate(160%);
+            -webkit-backdrop-filter: blur(8px) saturate(160%);
+            position: relative;
+            overflow: hidden;
+        }
+        .action-btn.solve-btn::before {
+            content: '';
+            position: absolute;
+            left: -60%;
+            top: 0;
+            width: 60%;
+            height: 100%;
+            background: linear-gradient(120deg, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0.04) 100%);
+            transform: skewX(-18deg);
+            transition: left 0.6s cubic-bezier(.4,0,.2,1);
+            pointer-events: none;
+        }
+        .action-btn.solve-btn:hover, .action-btn.solve-btn:active {
+            background: linear-gradient(90deg, rgba(15,23,42,0.55) 0%, rgba(6,182,212,0.18) 100%);
+            color: #38bdf8;
+            border: 1.5px solid #38bdf8;
+            box-shadow: 0 4px 24px #06b6d433, 0 0 0 2px #06b6d422;
+            transform: translateY(-2px) scale(1.045);
+        }
+        .action-btn.solve-btn:hover::before, .action-btn.solve-btn:active::before {
+            left: 110%;
+            transition: left 0.6s cubic-bezier(.4,0,.2,1);
+        }
+        .tabs {
+            display: flex;
+            gap: 18px;
+            margin-bottom: 18px;
+            border-bottom: 1.5px solid rgba(56,189,248,0.08);
+            background: none;
+            box-shadow: none;
+            padding: 0;
+        }
+        .tab-btn {
+            background: none;
+            border: none;
+            outline: none;
+            color: #a5b4fc;
+            font-size: 1.08rem;
+            font-weight: 600;
+            padding: 0 0 10px 0;
+            margin: 0;
+            position: relative;
+            cursor: pointer;
+            border-radius: 0;
+            transition: color 0.18s cubic-bezier(.4,0,.2,1);
+            letter-spacing: 0.01em;
+        }
+        .tab-btn::after {
+            content: '';
+            position: absolute;
+            left: 50%;
+            bottom: -3px;
+            width: 0;
+            height: 3px;
+            background: rgba(56,189,248,0.18);
+            box-shadow: 0 2px 12px 0 #06b6d4cc;
+            border-radius: 2px;
+            transform: translateX(-50%);
+            transition: width 0.32s cubic-bezier(.4,0,.2,1), background 0.18s;
+            backdrop-filter: blur(2.5px);
+        }
+        .tab-btn.active,
+        .tab-btn:hover,
+        .tab-btn:focus {
+            color: #e0f2fe;
+            text-shadow: 0 2px 8px #06b6d433;
+        }
+        .tab-btn.active::after,
+        .tab-btn:hover::after,
+        .tab-btn:focus::after {
+            width: 80%;
+            background: linear-gradient(90deg, #06b6d4 0%, #22d3ee 100%);
+        }
+    </style>
+    <script>
+        // Hamburger menu toggle
+        const hamburgerIcon = document.getElementById('hamburger-icon');
+        const dropdownMenu = document.getElementById('dropdown-menu');
+        hamburgerIcon.addEventListener('click', function(e) {
+            dropdownMenu.classList.toggle('active');
+            e.stopPropagation();
+        });
+        document.addEventListener('click', function(e) {
+            if (!dropdownMenu.contains(e.target) && !hamburgerIcon.contains(e.target)) {
+                dropdownMenu.classList.remove('active');
+            }
         });
     </script>
 </body>
