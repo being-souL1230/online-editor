@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ problem.title }} - User Problem | CodeZone</title>
+    <script src="https://unpkg.com/monaco-editor@0.33.0/min/vs/loader.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --bg-dark: #0f172a;
+            --bg-panel: rgba(30, 30, 47, 0.5);
+            --border: rgba(255, 255, 255, 0.08);
+            --text: #e2e8f0;
+            --text-secondary: #94a3b8;
+            --success: #10b981;
+            --error: #ef4444;
+            --warning: #f59e0b;
+        }
+        body {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            color: var(--text);
+            font-family: 'Segoe UI', 'Poppins', sans-serif;
+            min-height: 100vh;
+            margin: 0;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 30px 10px 30px 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+        .main-content {
+            display: flex;
+            gap: 25px;
+            flex-wrap: wrap;
+            align-items: stretch;
+        }
+        .problem-details {
+            flex: 1 1 320px;
+            background: var(--bg-panel);
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+            padding: 24px 20px 18px 20px;
+            min-width: 280px;
+            max-width: 400px;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            min-height: 0;
+        }
+        .problem-details h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 18px;
+            color: var(--primary);
+            margin-top: 0;
+        }
+        .problem-meta {
+            color: var(--text-secondary);
+            font-size: 0.98rem;
+            margin-bottom: 10px;
+        }
+        .problem-description {
+            background: rgba(40, 44, 52, 0.7);
+            border-radius: 10px;
+            padding: 14px 12px;
+            margin-bottom: 12px;
+            font-size: 1.05rem;
+            flex: 1 1 auto;
+            min-height: 80px;
+            max-height: 260px;
+            overflow-y: auto;
+            overflow-x: hidden;
+            word-break: break-word;
+        }
+        .problem-description::-webkit-scrollbar {
+            width: 8px;
+        }
+        .problem-description::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #6366f1 30%, #4f46e5 100%);
+            border-radius: 6px;
+        }
+        .problem-description::-webkit-scrollbar-track {
+            background: rgba(40, 44, 52, 0.3);
+            border-radius: 6px;
+        }
+        .problem-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+        .tag {
+            background: rgba(99, 102, 241, 0.15);
+            color: var(--primary);
+            font-size: 0.85rem;
+            padding: 5px 12px;
+            border-radius: 20px;
+            border: 1px solid rgba(99, 102, 241, 0.3);
+        }
+        .difficulty {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        .difficulty.Easy { background: #22c55e22; color: #22c55e; }
+        .difficulty.Medium { background: #eab30822; color: #eab308; }
+        .difficulty.Hard { background: #ef444422; color: #ef4444; }
+        .editor-section {
+            flex: 2 1 500px;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+            min-width: 320px;
+            min-height: 400px;
+        }
+        .card {
+            background: var(--bg-panel);
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+            padding: 0 0 18px 0;
+            display: flex;
+            flex-direction: column;
+        }
+        .card-header {
+            padding: 18px 25px 10px 25px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+        }
+        .card-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .controls {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+        select, button {
+            background: rgba(46, 46, 62, 0.8);
+            color: var(--text);
+            border: none;
+            padding: 10px 18px;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            outline: none;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.08);
+        }
+        select {
+            width: 120px;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23e2e8f0' viewBox='0 0 24 24'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 15px center;
+            background-size: 12px;
+            padding-right: 40px;
+            appearance: none;
+        }
+        button {
+            background: linear-gradient(90deg, var(--primary) 0%, #8b5cf6 100%);
+            padding: 10px 24px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+        }
+        button:hover {
+            background: linear-gradient(90deg, var(--primary-dark) 0%, #7c3aed 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(99, 102, 241, 0.3);
+        }
+        .card-body {
+            padding: 0 25px 0 25px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+        }
+        #monaco-editor {
+            width: 100%;
+            height: 320px;
+            border-radius: 10px;
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+        .input-label {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+        }
+        #stdin {
+            width: 100%;
+            min-height: 50px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: rgba(40, 44, 52, 0.7);
+            color: var(--text);
+            font-size: 1rem;
+            padding: 10px;
+            margin-bottom: 10px;
+            font-family: 'Consolas', monospace;
+        }
+        .output-panel {
+            background: rgba(21, 21, 32, 0.95);
+            border-radius: 14px;
+            border: 1px solid var(--border);
+            margin-top: 10px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            padding: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease;
+            max-height: 0;
+        }
+        .output-panel.expanded {
+            max-height: 300px;
+            padding: 18px 25px;
+        }
+        .output-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 8px;
+        }
+        .output-title {
+            font-size: 1.1rem;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .output-controls button {
+            background: rgba(30, 30, 47, 0.7);
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 0.95rem;
+        }
+        .output-controls button:hover {
+            background: rgba(30, 30, 47, 0.9);
+        }
+        #output-box {
+            font-family: 'Consolas', monospace;
+            font-size: 1.05rem;
+            color: var(--text);
+            background: rgba(30, 35, 60, 0.8);
+            border-radius: 8px;
+            padding: 12px;
+            min-height: 60px;
+            white-space: pre-wrap;
+            margin-top: 8px;
+        }
+        .dialog-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0,0,0,0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        .dialog-box {
+            background: #1e293b;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            max-width: 320px;
+            width: 90%;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+            color: #e2e8f0;
+            font-size: 1rem;
+        }
+        .dialog-box h3 {
+            margin-bottom: 15px;
+            color: #22d3ee;
+        }
+        .dialog-box.correct h3 { color: #34d399; }
+        .dialog-box.wrong h3 { color: #f87171; }
+        .dialog-box button {
+            padding: 8px 20px;
+            background: #22d3ee;
+            color: #0f172a;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background 0.3s ease;
+        }
+        .dialog-box button:hover { background: #67e8f9; }
+        @media (max-width: 900px) {
+            .main-content { flex-direction: column; }
+            .problem-details { max-width: 100%; }
+            .editor-section { min-width: 0; }
+        }
+        @media (max-width: 600px) {
+            .container { padding: 10px; }
+            .card-header, .card-body { padding: 10px !important; }
+            #monaco-editor { height: 200px; }
+        }
+        .feedback-section {
+            background: var(--bg-panel);
+            border-radius: 14px;
+            border: 1px solid var(--border);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            margin-top: 18px;
+            padding: 18px 20px;
+        }
+        .feedback-section h4 {
+            font-size: 1.1rem;
+            color: var(--primary);
+            margin-bottom: 12px;
+            font-weight: 600;
+        }
+        .feedback-item {
+            background: rgba(30, 35, 60, 0.8);
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            border: 1px solid var(--border);
+        }
+        .feedback-user {
+            color: #a855f7;
+            font-weight: 600;
+        }
+        .feedback-time {
+            color: #94a3b8;
+            font-size: 0.85rem;
+        }
+        .feedback-content {
+            color: #d8dee9;
+            margin-top: 4px;
+        }
+        .feedback-form textarea {
+            min-height: 60px;
+        }
+        .feedback-form button {
+            background: linear-gradient(135deg, #22c55e, #4ade80);
+            color: #fff;
+            border: 2px solid #22c55e;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            padding: 8px 20px;
+            margin-top: 6px;
+        }
+        .feedback-form button:hover {
+            background: linear-gradient(135deg, #16a34a, #22c55e);
+            border-color: #4ade80;
+        }
+        .error {
+            color: #ef4444;
+            background: rgba(239, 68, 68, 0.2);
+            padding: 8px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="main-content">
+            <div class="problem-details">
+                <h2><i class="fas fa-puzzle-piece"></i> {{ problem.title }}</h2>
+                <div class="problem-meta">
+                    <span class="difficulty {{ problem.difficulty }}">{{ problem.difficulty }}</span>
+                    <span>| Posted: {{ problem.created_at }}</span>
+                </div>
+                <div class="problem-tags">
+                    {% for tag in problem.tags.split(',') if problem.tags %}
+                        <span class="tag">{{ tag.strip() }}</span>
+                    {% endfor %}
+                </div>
+                <div class="problem-description">{{ problem.description | safe | markdown }}</div>
+            </div>
+            <div class="editor-section">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title"><i class="fas fa-laptop-code"></i> Code Editor</div>
+                        <div class="controls">
+                            <select id="language">
+                                <option value="71">Python</option>
+                                <option value="54">C++</option>
+                                <option value="50">C</option>
+                            </select>
+                            <button id="run-btn"><i class="fas fa-play"></i> Run</button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div id="monaco-editor"></div>
+                        <label class="input-label" for="stdin">Custom Input (optional):</label>
+                        <textarea id="stdin" placeholder="Input for your code..."></textarea>
+                    </div>
+                </div>
+                <div class="output-panel" id="output-panel">
+                    <div class="output-header">
+                        <div class="output-title"><i class="fas fa-terminal"></i> Program Output</div>
+                        <div class="output-controls">
+                            <button onclick="clearOutput()" title="Clear Output"><i class="fas fa-trash"></i></button>
+                            <button onclick="toggleOutput()" title="Expand/Collapse Output"><i class="fas fa-arrows-alt-v"></i></button>
+                        </div>
+                    </div>
+                    <div id="output-box"></div>
+                </div>
+            </div>
+        </div>
+        <div class="dialog-overlay" id="dialog-overlay">
+            <div class="dialog-box" id="dialog-box">
+                <h3 id="dialog-status">Result</h3>
+                <p id="dialog-message"></p>
+                <button onclick="closeDialog()">OK</button>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js"></script>
+    <script>
+        // Monaco Editor Integration
+        let editor;
+        const languageMap = { '71': 'python', '54': 'cpp', '50': 'c' };
+        require.config({ paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.44.0/min/vs' } });
+        require(['vs/editor/editor.main'], function () {
+            editor = monaco.editor.create(document.getElementById('monaco-editor'), {
+                value: '',
+                language: languageMap[document.getElementById('language').value],
+                theme: 'vs-dark',
+                automaticLayout: true,
+                fontSize: 15,
+                minimap: { enabled: false }
+            });
+        });
+        document.getElementById('language').addEventListener('change', function() {
+            if (editor) {
+                const lang = languageMap[this.value];
+                monaco.editor.setModelLanguage(editor.getModel(), lang);
+            }
+        });
+        // Output panel expand/collapse
+        let outputExpanded = false;
+        function toggleOutput() {
+            const panel = document.getElementById('output-panel');
+            outputExpanded = !outputExpanded;
+            if (outputExpanded) {
+                panel.classList.add('expanded');
+            } else {
+                panel.classList.remove('expanded');
+            }
+        }
+        function clearOutput() {
+            document.getElementById('output-box').textContent = '';
+        }
+        // Real-time code execution for user problems with output checking and dialog
+        document.getElementById('run-btn').addEventListener('click', async function() {
+            const code = editor ? editor.getValue() : '';
+            const language = document.getElementById('language').value;
+            const stdin = document.getElementById('stdin').value;
+            const outputBox = document.getElementById('output-box');
+            outputBox.textContent = 'Running...';
+            try {
+                const response = await fetch('/run_user_problem', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        code: code,
+                        language: language,
+                        stdin: stdin,
+                        problem_id: "{{ problem.id }}"
+                    })
+                });
+                const result = await response.json();
+                outputBox.textContent = result.output || result.message || 'No output.';
+                // Output checking (exact match)
+                const expected = `{{ problem.expected_output | e }}`.trim();
+                const actual = (result.output || '').trim();
+                if (expected.length > 0) {
+                    const dialogOverlay = document.getElementById('dialog-overlay');
+                    const dialogBox = document.getElementById('dialog-box');
+                    const dialogStatus = document.getElementById('dialog-status');
+                    const dialogMessage = document.getElementById('dialog-message');
+                    if (actual === expected) {
+                        dialogStatus.textContent = 'Correct!';
+                        dialogMessage.textContent = 'Output matches expected output.';
+                        dialogBox.classList.remove('wrong');
+                        dialogBox.classList.add('correct');
+                    } else {
+                        dialogStatus.textContent = 'Wrong!';
+                        dialogMessage.textContent = 'Output does not match expected output.';
+                        dialogBox.classList.remove('correct');
+                        dialogBox.classList.add('wrong');
+                    }
+                    dialogOverlay.style.display = 'flex';
+                }
+            } catch (err) {
+                outputBox.textContent = 'Error running code.';
+            }
+        });
+        function closeDialog() {
+            document.getElementById('dialog-overlay').style.display = 'none';
+        }
+    </script>
+</body>
+</html> 
