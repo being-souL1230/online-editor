@@ -132,7 +132,6 @@ During development, several real-world issues were encountered and solved with c
 - `debug_language_ids.py` — Language ID debug tool
 - `check_database_schema.py` — Print DB schema
 - `dummy_problems.sql` — SQL for test problems
-- `.gitignore` — Ignore venv, pycache, etc.
 
 ---
 
@@ -143,7 +142,6 @@ During development, several real-world issues were encountered and solved with c
 - **Code execution not working:** Test with `quick_test.py` or `test_execution.py`.
 - **Output checker issues:** Use `test_checker_types.py`.
 - **Language ID issues:** Use `debug_language_ids.py`.
-- **Unwanted files in git:** Update `.gitignore` and run `git rm --cached <file>`.
 
 ---
 
