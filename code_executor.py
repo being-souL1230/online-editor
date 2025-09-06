@@ -15,6 +15,7 @@ import re
 from pathlib import Path
 from typing import Dict, List, Tuple, Optional
 import uuid
+import platform
 
 class CodeExecutor:
     def __init__(self):
@@ -90,14 +91,23 @@ class CodeExecutor:
             ]
             
             # Execute with timeout and input
-            process = subprocess.Popen(
-                cmd,
-                stdin=subprocess.PIPE,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
-                text=True,
-                preexec_fn=os.setsid if os.name != 'nt' else None
-            )
+            if platform.system() == 'Windows':
+                process = subprocess.Popen(
+                    cmd,
+                    stdin=subprocess.PIPE,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.PIPE,
+                    text=True
+                )
+            else:
+                process = subprocess.Popen(
+                    cmd,
+                    stdin=subprocess.PIPE,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.PIPE,
+                    text=True,
+                    preexec_fn=os.setsid
+                )
             
             try:
                 stdout, stderr = process.communicate(input=stdin, timeout=timeout)
@@ -122,10 +132,10 @@ class CodeExecutor:
                     
             except subprocess.TimeoutExpired:
                 # Kill the process and its children
-                if os.name != 'nt':
-                    os.killpg(os.getpgid(process.pid), signal.SIGTERM)
-                else:
+                if platform.system() == 'Windows':
                     process.terminate()
+                else:
+                    os.killpg(os.getpgid(process.pid), signal.SIGTERM)
                 
                 process.wait()
                 return {
@@ -152,7 +162,7 @@ class CodeExecutor:
             code_file.write(source_code)
             code_path = code_file.name
         
-        exe_path = code_path.replace('.cpp', '.exe') if os.name == 'nt' else code_path.replace('.cpp', '')
+        exe_path = code_path.replace('.cpp', '.exe') if platform.system() == 'Windows' else code_path.replace('.cpp', '')
         
         try:
             # Compile C++ code
@@ -170,14 +180,23 @@ class CodeExecutor:
             
             # Execute compiled code
             exec_cmd = [exe_path]
-            process = subprocess.Popen(
-                exec_cmd,
-                stdin=subprocess.PIPE,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
-                text=True,
-                preexec_fn=os.setsid if os.name != 'nt' else None
-            )
+            if platform.system() == 'Windows':
+                process = subprocess.Popen(
+                    exec_cmd,
+                    stdin=subprocess.PIPE,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.PIPE,
+                    text=True
+                )
+            else:
+                process = subprocess.Popen(
+                    exec_cmd,
+                    stdin=subprocess.PIPE,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.PIPE,
+                    text=True,
+                    preexec_fn=os.setsid
+                )
             
             try:
                 stdout, stderr = process.communicate(input=stdin, timeout=timeout)
@@ -201,10 +220,10 @@ class CodeExecutor:
                     }
                     
             except subprocess.TimeoutExpired:
-                if os.name != 'nt':
-                    os.killpg(os.getpgid(process.pid), signal.SIGTERM)
-                else:
+                if platform.system() == 'Windows':
                     process.terminate()
+                else:
+                    os.killpg(os.getpgid(process.pid), signal.SIGTERM)
                 
                 process.wait()
                 return {
@@ -233,7 +252,7 @@ class CodeExecutor:
             code_file.write(source_code)
             code_path = code_file.name
         
-        exe_path = code_path.replace('.c', '.exe') if os.name == 'nt' else code_path.replace('.c', '')
+        exe_path = code_path.replace('.c', '.exe') if platform.system() == 'Windows' else code_path.replace('.c', '')
         
         try:
             # Compile C code
@@ -251,14 +270,23 @@ class CodeExecutor:
             
             # Execute compiled code
             exec_cmd = [exe_path]
-            process = subprocess.Popen(
-                exec_cmd,
-                stdin=subprocess.PIPE,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
-                text=True,
-                preexec_fn=os.setsid if os.name != 'nt' else None
-            )
+            if platform.system() == 'Windows':
+                process = subprocess.Popen(
+                    exec_cmd,
+                    stdin=subprocess.PIPE,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.PIPE,
+                    text=True
+                )
+            else:
+                process = subprocess.Popen(
+                    exec_cmd,
+                    stdin=subprocess.PIPE,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.PIPE,
+                    text=True,
+                    preexec_fn=os.setsid
+                )
             
             try:
                 stdout, stderr = process.communicate(input=stdin, timeout=timeout)
@@ -282,10 +310,10 @@ class CodeExecutor:
                     }
                     
             except subprocess.TimeoutExpired:
-                if os.name != 'nt':
-                    os.killpg(os.getpgid(process.pid), signal.SIGTERM)
-                else:
+                if platform.system() == 'Windows':
                     process.terminate()
+                else:
+                    os.killpg(os.getpgid(process.pid), signal.SIGTERM)
                 
                 process.wait()
                 return {
@@ -353,4 +381,4 @@ int main() {
     print(f"Output: {result['output']}")
 
 if __name__ == "__main__":
-    test_executor() 
+    test_executor()
